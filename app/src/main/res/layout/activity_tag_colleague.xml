@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Core.TagColleagueActivity"
+    android:orientation="vertical"
+    android:background="@drawable/white_background_border">
+
+    <SearchView
+        android:id="@+id/searchColleague"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:iconifiedByDefault="false"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:searchIcon="@drawable/ic_search_24dp"
+        android:elevation="0dp"
+        android:queryHint="@string/search"
+        android:background="@drawable/less_gray_less_rounded_border">
+        <requestFocus />
+    </SearchView>
+
+    <ListView
+        android:id="@+id/colleagueListView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.7"
+        android:elevation="0dp"
+        android:background="@drawable/white_background_no_border"
+        android:divider="#ffffff"/>
+
+    <Button
+        android:id="@+id/tagColleagueButton"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="0.06"
+        android:minHeight="50dp"
+        android:text="Tag"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/rounded_borders"
+        android:layout_gravity="end"
+        android:layout_margin="10dp"
+        android:paddingStart="30dp"
+        android:paddingEnd="30dp"/>
+
+</LinearLayout>

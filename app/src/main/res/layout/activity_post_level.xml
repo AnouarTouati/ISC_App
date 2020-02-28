@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Core.PostLevelActivity"
+    android:background="@drawable/white_background_border"
+    android:orientation="vertical">
+
+
+    <ListView
+        android:id="@+id/postLevelListView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:divider="#ffffff"
+        android:background="@drawable/white_background_border"/>
+
+    <Button
+        android:id="@+id/postLevelButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Check"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/rounded_borders"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="10dp"
+        android:paddingStart="30dp"
+        android:paddingEnd="30dp"/>
+</LinearLayout>

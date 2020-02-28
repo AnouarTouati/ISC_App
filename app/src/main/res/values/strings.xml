@@ -1,0 +1,67 @@
+<resources>
+    <string name="app_name">ISC</string>
+    <string name="logo">ISC</string>
+    <string name="create_account_signin">Create an account, or sign in.</string>
+    <string name="terms_and_conditions">Terms &amp; Conditions</string>
+    <string name="next">NEXT</string>
+    <string name="login">Login</string>
+    <string name="logout">Logout</string>
+    <string name="enter_phone">Enter your phone number</string>
+    <string name="send">send</string>
+    <string name="verify">Verify</string>
+    <string name="creating_account_accepting_terms">By creating an account, you accept the</string>
+    <string name="invalid_login_number_error">Valid number is required</string>
+    <string name="invalid_code_error">Enter code&#8230;</string>
+    <string name="your_phone">Your phone number is </string>
+    <string name="Internet_is_needed">Internet is needed</string>
+    <string name="enter_email_and_password">Enter your email and password</string>
+    <string name="password">Password</string>
+    <string name="sign_up">Sign up now!</string>
+    <string name="singup">Sign up</string>
+    <string name="new_here">New here?</string>
+    <string name="already_have_account">You already have an account?</string>
+    <string name="signup">Sign up</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="login_now">Login now!</string>
+    <string name="title_activity_core">CoreActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="enter_name_position">Enter your name and position in ISC</string>
+    <string name="full_name">Full Name</string>
+    <string name="position">Position</string>
+    <string name="department">Department</string>
+    <string name="member">Member</string>
+    <string name="head">Head</string>
+    <string name="authenticate">Authenticate</string>
+    <string name="title_profile">Profile</string>
+    <string name="search">Search</string>
+    <string name="message">Message</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="post_edit_text_hint">Let ISC members know...</string>
+    <string name="post">Post</string>
+    <string name="post_level_text">Select the departments in which to include your post:</string>
+    <string name="photo">Photo</string>
+    <string name="include_event">Include an event</string>
+    <string name="tag_colleague">Tag a colleague</string>
+    <string name="specify_departments">Specify departments</string>
+    <string name="include_events">Select the events that you your post includes:</string>
+    <string name="edit">Edit</string>
+    <string name="title_activity_main3">Main3Activity</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_tools">Tools</string>
+    <string name="menu_share">Share</string>
+    <string name="menu_send">Send</string>
+
+</resources>
+
