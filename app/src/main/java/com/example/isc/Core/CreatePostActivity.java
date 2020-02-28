@@ -97,7 +97,7 @@ public class CreatePostActivity extends AppCompatActivity {
         }catch (NullPointerException e){}
 
 
-      //  cpImage = findViewById(R.id.cpImage);
+
         showPostLevelImageButton = findViewById(R.id.showPostLevelImageButton);
         cpEditText = findViewById(R.id.cpEditText);
         cpEditText.setText(textToPost);

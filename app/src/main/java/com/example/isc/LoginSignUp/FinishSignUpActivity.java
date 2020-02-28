@@ -100,7 +100,7 @@ public class FinishSignUpActivity extends AppCompatActivity {
     public void signUpUser(View view){
         final String name = signUpFullName.getText().toString();
         final String department = departments.get(departmentSpinner.getSelectedItemPosition());
-        final int positionSelected = positionRadio.getCheckedRadioButtonId();
+        final int positionSelected = (positionRadio.getCheckedRadioButtonId())-1;
 
         if(!isValidName(name)){
             Toast.makeText(this,"Invalid Full Name",Toast.LENGTH_LONG).show();
@@ -114,7 +114,7 @@ public class FinishSignUpActivity extends AppCompatActivity {
 
 
         if(positionSelected != 0 && positionSelected != 1){
-            Toast.makeText(this,"Please select a position",Toast.LENGTH_LONG).show();
+            Toast.makeText(this,"Please select a position "+positionSelected,Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -188,11 +188,11 @@ public class FinishSignUpActivity extends AppCompatActivity {
    }
     void addFullProfileToDataBase(String name,int position,String department){
         firebaseFirestore=FirebaseFirestore.getInstance();
-        Map<String,Object> map =new HashMap<>();
+        final Map<String,Object> map =new HashMap<>();
         map.put("name",name);
         map.put("position",position);
         map.put("department",department);
-
+        map.put("profileImageReferenceInStorage","images/" + firebaseUser.getUid() + "/" + "ProfileImage" + ".JPEG");
         firebaseFirestore.collection("Profiles").document(firebaseUser.getUid()).set(map).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
@@ -202,7 +202,7 @@ public class FinishSignUpActivity extends AppCompatActivity {
                         progressDialog.dismiss();
                         startActivity(new Intent(getApplicationContext(), CoreActivity.class));
                     }else{
-                        pushPostImageToServer("images/" + firebaseUser.getUid() + "/" + "ProfileImage" + ".JPEG",signUpProfileImageBitmap);
+                        pushPostImageToServer(map.get("profileImageReferenceInStorage").toString(),signUpProfileImageBitmap);
                     }
 
 

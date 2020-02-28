@@ -139,9 +139,7 @@ public class HomeFragment extends Fragment {
                       for (DocumentSnapshot snap : allProfiles){
                           MyUser user=new MyUser(snap.getId(),null,snap.get("name").toString(), Common.position[snap.getLong("position").intValue()]);
                           allUsersProfiles.add(user);
-                           //the commented code below was copied from ProfileFragment and needs modification
-                          //there is no way of uploading profile image yet so leave it commented
-                          // getImageFromServer(task.getResult().get("profileImageReferenceInStorage").toString(),-1);//-1 indicates profile image
+                           getImageFromServer(snap.get("profileImageReferenceInStorage").toString(),allUsersProfiles.size()-1,true);
                       }
                       getUserPosts();
                   }else{
@@ -199,8 +197,17 @@ public class HomeFragment extends Fragment {
                         postArrayList.add(arrayListIndex,aPost);
                         dataUpdatedNotifyListView();
                     }else{
-                        allUsersProfiles.get(arrayListIndex).setProfileImageBitmap((BitmapFactory.decodeByteArray(task.getResult().clone(),0,task.getResult().length)));
-                        dataUpdatedNotifyListView();//might consider to reimplement this method since as it is there is no update profile pictures
+                       int postIndex= findIndexOfThePostWithThisUserProfile(allUsersProfiles.get(arrayListIndex));
+                       if(postIndex!=-1){
+                           allUsersProfiles.get(arrayListIndex).setProfileImageBitmap((BitmapFactory.decodeByteArray(task.getResult().clone(),0,task.getResult().length)));
+                           postArrayList.get(postIndex).setMyUser(allUsersProfiles.get(arrayListIndex));
+                           dataUpdatedNotifyListView();
+                           Log.v("ConnectivityFireBase", "Received Profile pic successfully for home ");
+                       }else{
+                           //one solution is to get the posts first anyway i will figure that out later
+                           Log.v("ConnectivityFireBase","we loaded profile pic of a user who doesn't have a post aka wasted mobile data");
+                       }
+
                     }
 
                 }
@@ -211,6 +218,16 @@ public class HomeFragment extends Fragment {
         });
     }
 
+
+    int findIndexOfThePostWithThisUserProfile(MyUser aUser){
+        for (int i=0;i<postArrayList.size();i++){
+            MyPost aPost=postArrayList.get(i);
+            if(aPost.getMyUser().getUserID().equals(aUser.getUserID())){
+              return i;
+            }
+        }
+        return -1;
+    }
     void dataUpdatedNotifyListView() {
         homeListAdapter = new HomeListAdapter(getContext(), R.layout.activity_home_list_adapter, postArrayList);
         postListView.setAdapter(homeListAdapter);

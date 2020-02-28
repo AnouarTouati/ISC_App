@@ -38,5 +38,5 @@ dependencies {
     implementation 'com.google.firebase:firebase-storage:19.1.1'
     implementation 'com.google.firebase:firebase-firestore:21.4.0'
     implementation 'de.hdodenhof:circleimageview:3.0.0'
-
+    implementation 'com.google.firebase:firebase-messaging:20.1.0'
 }

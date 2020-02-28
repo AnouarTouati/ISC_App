@@ -29,6 +29,8 @@ public class CoreActivity extends AppCompatActivity {
         setContentView(R.layout.activity_core);
 
 
+
+
         homeFragment = new HomeFragment();
         notificationFragment = new NotificationFragment();
         profileFragment = new ProfileFragment();

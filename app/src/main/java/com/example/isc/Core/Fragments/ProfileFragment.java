@@ -3,6 +3,7 @@ package com.example.isc.Core.Fragments;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
@@ -43,6 +44,7 @@ import java.util.Objects;
 public class ProfileFragment extends Fragment {
 
     private ImageView profileImage;
+    private Bitmap profileImageAsBitmap;
     private LinearLayout nameLayout, positionLayout, studentNumberLayout, emailLayout, postLayout;
     private TextView nameTextView, positionTextView, studentNumberTextView, emailTextView;
     private EditText nameEditText, positionEditText, studentNumberEditText, emailEditText;
@@ -79,15 +81,15 @@ public class ProfileFragment extends Fragment {
 
                     //i will deal with the image later
                     myUser0 = new MyUser(firebaseUser.getUid(),null, (String) task.getResult().get("name"), Common.position[task.getResult().getLong("position").intValue()]);
-                    Log.v("ConnectivityFireBase", "Received profile successfully (without image)");
+                    Log.v("ConnectivityFireBase", "Received profile successfully");
 
                     nameTextView.setText(myUser0.getFullName());
                     positionTextView.setText(myUser0.getPosition());
                     studentNumberTextView.setText("Not Implemented yet");
                     emailTextView.setText(firebaseUser.getEmail());
-                    //there is no way of uploading profile image yet so leave it commented
-                    // getImageFromServer(task.getResult().get("profileImageReferenceInStorage").toString(),-1);//-1 indicates profile image
-                    getUserPosts();
+
+                    getImageFromServer(task.getResult().get("profileImageReferenceInStorage").toString(),-1);//-1 indicates profile image
+
                 } else {
                     Log.v("ConnectivityFireBase", "Error receiving profile " + task.getException());
                 }
@@ -318,7 +320,11 @@ public class ProfileFragment extends Fragment {
                         postArrayList.add(postArrayListIndex,aPost);
                         dataUpdatedNotifyListView();
                     }else if (postArrayListIndex==-1/*aka the profile image*/){
-                        profileImage.setImageBitmap(BitmapFactory.decodeByteArray(task.getResult().clone(),0,task.getResult().length));
+                        profileImageAsBitmap=BitmapFactory.decodeByteArray(task.getResult().clone(),0,task.getResult().length);
+                        profileImage.setImageBitmap(profileImageAsBitmap);
+                        //the below statements must stay in order and here since we want to use myUser0 to instantiate the post
+                        myUser0.setProfileImageBitmap(profileImageAsBitmap);
+                        getUserPosts();
                     }
 
                 }
