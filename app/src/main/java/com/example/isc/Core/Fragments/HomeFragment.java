@@ -139,7 +139,8 @@ public class HomeFragment extends Fragment {
                       for(int i=0;i<allProfiles.size();i++){
                           MyUser user=new MyUser(allProfiles.get(i).getId(),null,allProfiles.get(i).get("name").toString(), Common.position[allProfiles.get(i).getLong("position").intValue()]);
                           allUsersProfiles.add(user);
-                           getImageFromServer(allProfiles.get(i).get("profileImageReferenceInStorage").toString(),allUsersProfiles.size()-1,true);
+                         //we check for valid reference inside getImageFromServer method
+                           getImageFromServer(allProfiles.get(i).get("profileImageReferenceInStorage").toString(),allUsersProfiles.size()-1,-999/*aka we wont need this parameter, it is profile image*/,true);
                       }
                       getUserPosts();
                   }else{
@@ -159,16 +160,16 @@ public class HomeFragment extends Fragment {
                public void onComplete(@NonNull Task<QuerySnapshot> task) {
                    if (task.isSuccessful()) {
                        List<DocumentSnapshot> allPostByThisUser=task.getResult().getDocuments();
-                    if(allPostByThisUser.size()>0){
-                        DocumentSnapshot snapshot=allPostByThisUser.get(0);//only use the latest for now
+                    for(int j=0;j<allPostByThisUser.size();j++){
+                        DocumentSnapshot snapshot=allPostByThisUser.get(j);
 
                         String cpText = snapshot.get("cpText").toString();
                         String checkedDepartments = snapshot.get("checkedDepartments").toString();
                         String colleagues = snapshot.get("colleagues").toString();
                         String events = snapshot.get("events").toString();
-                        postArrayList.add(new MyPost(allUsersProfiles.get(finalI), cpText, null, checkedDepartments, colleagues, events));
+                        postArrayList.add(new MyPost(allUsersProfiles.get(finalI),j,cpText, null, checkedDepartments, colleagues, events));
                         String imageReferenceInStorage=snapshot.get("imageReferenceInStorage").toString();
-                        getImageFromServer(imageReferenceInStorage,postArrayList.size()-1/*aka index where the image should be placed*/,false);
+                        getImageFromServer(imageReferenceInStorage,finalI/*aka index where the image should be placed*/,j,false);
 
                         dataUpdatedNotifyListView();
                     }
@@ -182,7 +183,7 @@ public class HomeFragment extends Fragment {
        }
 
     }
-    void getImageFromServer(String storageReferencePath, final int arrayListIndex, final boolean aProfileImage){
+    void getImageFromServer(String storageReferencePath, final int allUsersProfilesIndex, final int indexOfPostForThisUser, final boolean aProfileImage){
         if(storageReferencePath!=null){
         if(!storageReferencePath.equals("")){
 
@@ -194,21 +195,26 @@ public class HomeFragment extends Fragment {
                 public void onComplete(@NonNull Task<byte[]> task) {
                     if(task.isSuccessful()){
                         if(!aProfileImage){
-                            MyPost aPost=postArrayList.get(arrayListIndex);
-                            aPost.setPostedImage(BitmapFactory.decodeByteArray(task.getResult().clone(),0,task.getResult().length));
-                            postArrayList.remove(arrayListIndex);
-                            postArrayList.add(arrayListIndex,aPost);
-                            dataUpdatedNotifyListView();
-                        }else{
-                            int postIndex= findIndexOfThePostWithThisUserProfile(allUsersProfiles.get(arrayListIndex));
-                            if(postIndex!=-1){
-                                allUsersProfiles.get(arrayListIndex).setProfileImageBitmap((BitmapFactory.decodeByteArray(task.getResult().clone(),0,task.getResult().length)));
-                                postArrayList.get(postIndex).setMyUser(allUsersProfiles.get(arrayListIndex));
+
+                            int theExactPostFromTheExactUser=findIndexOfTheExactPost(allUsersProfiles.get(allUsersProfilesIndex),indexOfPostForThisUser);
+                            if(theExactPostFromTheExactUser!=-1){
+                                MyPost aPost=postArrayList.get(theExactPostFromTheExactUser);
+                                aPost.setPostedImage(BitmapFactory.decodeByteArray(task.getResult().clone(),0,task.getResult().length));
+                                postArrayList.remove(theExactPostFromTheExactUser);
+                                postArrayList.add(theExactPostFromTheExactUser,aPost);
                                 dataUpdatedNotifyListView();
-                                Log.v("ConnectivityFireBase", "Received Profile pic successfully for home ");
-                            }else{
-                                //one solution is to get the posts first anyway i will figure that out later
-                                Log.v("ConnectivityFireBase","we loaded profile pic of a user who doesn't have a post aka wasted mobile data");
+                            }else
+                            {
+                                Log.v("ConnectivityFireBase","Could not find the exact post of user");
+                            }
+
+                        }else{
+                            ArrayList<Integer> postsIndexes= findIndexesOfThePostWithThisUserProfile(allUsersProfiles.get(allUsersProfilesIndex));
+                            for(int i=0;i<postsIndexes.size();i++){
+                                allUsersProfiles.get(allUsersProfilesIndex).setProfileImageBitmap((BitmapFactory.decodeByteArray(task.getResult().clone(),0,task.getResult().length)));
+                                postArrayList.get(postsIndexes.get(i)).setMyUser(allUsersProfiles.get(allUsersProfilesIndex));
+                                dataUpdatedNotifyListView();
+
                             }
 
                         }
@@ -220,29 +226,46 @@ public class HomeFragment extends Fragment {
                 }
             });
         }else{
-            addPostToArrayListWithoutImage(arrayListIndex);
+            if(!aProfileImage){
+                addPostToArrayListWithoutImage(allUsersProfiles.get(allUsersProfilesIndex),indexOfPostForThisUser);
+            }
+
         }
 
         }else{
-            addPostToArrayListWithoutImage(arrayListIndex);}
+            if(!aProfileImage){
+                addPostToArrayListWithoutImage(allUsersProfiles.get(allUsersProfilesIndex),indexOfPostForThisUser);
+            }
+        }
 
     }
- void addPostToArrayListWithoutImage(int arrayListIndex){
-     MyPost aPost=postArrayList.get(arrayListIndex);
+ void addPostToArrayListWithoutImage(MyUser aUser,int indexOfPostForThisUser){
+        int postIndex=findIndexOfTheExactPost(aUser,indexOfPostForThisUser);
+     MyPost aPost=postArrayList.get(postIndex);
      aPost.setPostedImage(null);
-     postArrayList.remove(arrayListIndex);
-     postArrayList.add(arrayListIndex,aPost);
+     postArrayList.remove(postIndex);
+     postArrayList.add(postIndex,aPost);
      dataUpdatedNotifyListView();
  }
 
-    int findIndexOfThePostWithThisUserProfile(MyUser aUser){
+    ArrayList<Integer> findIndexesOfThePostWithThisUserProfile(MyUser aUser){
+        ArrayList<Integer> indexes=new ArrayList<>();
         for (int i=0;i<postArrayList.size();i++){
             MyPost aPost=postArrayList.get(i);
             if(aPost.getMyUser().getUserID().equals(aUser.getUserID())){
-              return i;
+             indexes.add(i);
             }
         }
-        return -1;
+       return indexes;
+    }
+    int findIndexOfTheExactPost(MyUser aUser,int indexOfPostForThisUser){
+        for (int i=0;i<postArrayList.size();i++){
+            MyPost aPost=postArrayList.get(i);
+            if(aPost.getMyUser().getUserID().equals(aUser.getUserID())&& aPost.getIndexOfPostForThisUser()==indexOfPostForThisUser){
+               return i;
+            }
+        }
+        return -1;//failed to find the post
     }
     void dataUpdatedNotifyListView() {
         homeListAdapter = new HomeListAdapter(getContext(), R.layout.activity_home_list_adapter, postArrayList);

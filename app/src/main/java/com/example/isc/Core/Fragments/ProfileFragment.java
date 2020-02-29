@@ -88,7 +88,7 @@ public class ProfileFragment extends Fragment {
                     positionTextView.setText(myUser0.getPosition());
                     studentNumberTextView.setText("Not Implemented yet");
                     emailTextView.setText(firebaseUser.getEmail());
-
+                    //we check for valid reference inside getImageFromServer method
                     getImageFromServer(task.getResult().get("profileImageReferenceInStorage").toString(),-1);//-1 indicates profile image
 
                 } else {
@@ -288,7 +288,7 @@ public class ProfileFragment extends Fragment {
                         String checkedDepartments = snapshots.get(i).get("checkedDepartments").toString();
                         String colleagues = snapshots.get(i).get("colleagues").toString();
                         String events = snapshots.get(i).get("events").toString();
-                        postArrayList.add(new MyPost(myUser0, cpText, null, checkedDepartments, colleagues, events));
+                        postArrayList.add(new MyPost(myUser0, i/*this i here is useless we just use it for home*/,cpText, null, checkedDepartments, colleagues, events));
                         String imageReferenceInStorage=snapshots.get(i).get("imageReferenceInStorage").toString();
                         getImageFromServer(imageReferenceInStorage,postArrayList.size()-1/*aka index where the image should be placed*/);
                     }

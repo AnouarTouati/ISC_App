@@ -8,9 +8,9 @@ public class MyPost {
     private Bitmap postedImageBitmap;
     private MyUser myUser;
 
+   private int indexOfPostForThisUser;//cause we might have multiple post by a single user
 
-
-    public MyPost(MyUser myUser, String postedText, Bitmap postedImageBitmap,
+    public MyPost(MyUser myUser,int indexOfPostForThisUser, String postedText, Bitmap postedImageBitmap,
                   String myPostLevel, String myPostTagColleague, String myPostEvents){
         this.postedText = postedText;
         this.postedImageBitmap = postedImageBitmap;
@@ -18,6 +18,7 @@ public class MyPost {
         this.myPostLevel = myPostLevel;
         this.myPostTagColleague = myPostTagColleague;
         this.myPostEvents = myPostEvents;
+        this.indexOfPostForThisUser=indexOfPostForThisUser;
     }
 
     public String getMyPostEvents() {
@@ -66,5 +67,8 @@ public class MyPost {
 
     public void setPostedImage(Bitmap postedImageBitmap) {
         this.postedImageBitmap = postedImageBitmap;
+    }
+    public int getIndexOfPostForThisUser(){
+        return indexOfPostForThisUser;
     }
 }

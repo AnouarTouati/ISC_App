@@ -220,7 +220,7 @@ public class CreatePostActivity extends AppCompatActivity {
         }
     }
 
-    void createNotificationDataOnServer(final String checkedDepartments, String postID){
+    void createNotificationDataOnServer(final String checkedDepartments, final String postID){
         firebaseFirestore.collection("AllPosts").document(/*aka users*/firebaseUser.getUid()).collection("userPosts").document(postID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -237,7 +237,7 @@ public class CreatePostActivity extends AppCompatActivity {
                         map.put("notificationTime","");
                     }
 
-                firebaseFirestore.collection("Notifications").document(firebaseUser.getUid()).set(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                firebaseFirestore.collection("Notifications").document(postID).set(map).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()){
