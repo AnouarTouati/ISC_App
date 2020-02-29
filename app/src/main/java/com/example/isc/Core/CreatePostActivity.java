@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -21,12 +20,14 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager.widget.ViewPager;
 
 import com.example.isc.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -58,12 +59,13 @@ public class CreatePostActivity extends AppCompatActivity {
     Button postButton;
     ImageButton showPostLevelImageButton;
     LinearLayout createPostLL, optionsLL, photoLL, includeEventLL, tagColleagueLL, specifyDepartmentLL;
+    ScrollView scrollView;
     TextView photoLLTextView, eventsTextView;
     public static final int PICK_IMAGE = 1;
 
-    public static String checkedDepartments = "none", events = "", colleagues = "none",textToPost="";
+    public  String checkedDepartments = "", events = "", colleagues = "",textToPost="";
 
-    public static final String MY_PREFS_NAME = "MyPrefsFile";
+  //  public static final String MY_PREFS_NAME = "MyPrefsFile";
 
     ProgressDialog progressDialog;
 
@@ -71,11 +73,22 @@ public class CreatePostActivity extends AppCompatActivity {
     FirebaseFirestore firebaseFirestore;
     FirebaseUser firebaseUser;
 
+    CreatePostViewPagerAdapter viewPagerAdapter;
+    ViewPager viewPager;
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_post);
+
+        scrollView=findViewById(R.id.createPostScrollView);
+        viewPagerAdapter=new CreatePostViewPagerAdapter(getSupportFragmentManager());
+        viewPagerAdapter.addFragment(new IncludeEventActivity());
+        viewPagerAdapter.addFragment(new TagColleagueActivity());
+        viewPagerAdapter.addFragment(new PostLevelActivity());
+        viewPager=findViewById(R.id.createPostViewPager);
+        viewPager.setAdapter(viewPagerAdapter);
+
 
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -96,13 +109,13 @@ public class CreatePostActivity extends AppCompatActivity {
         postButton = findViewById(R.id.postButton);
         postButton.setTextColor(Color.GRAY);
 
-        SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+       // SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
         cpImage = findViewById(R.id.cpImage);
-        try{
+    /*    try{
             Bitmap bitmapImage = stringToBitmap(Objects.requireNonNull(prefs.getString("cpImage", null)));
             cpImageAsBitmap=bitmapImage;
             cpImage.setImageBitmap(bitmapImage);
-        }catch (NullPointerException e){}
+        }catch (NullPointerException e){}*/
 
 
 
@@ -348,7 +361,7 @@ public class CreatePostActivity extends AppCompatActivity {
             chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{pickIntent});
             startActivityForResult(chooserIntent, PICK_IMAGE);
         } else {
-            cpImage.setImageDrawable(null);
+            cpImage.setImageBitmap(null);
             cpImageAsBitmap = null;
             photoLLTextView.setText("Photo");
             if (cpEditText.getText().toString().trim().length() == 0) {
@@ -379,9 +392,9 @@ public class CreatePostActivity extends AppCompatActivity {
                 cpImageAsBitmap = BitmapFactory.decodeStream(inputStream);
                 cpImage.setImageBitmap(cpImageAsBitmap);
 
-                SharedPreferences.Editor editor = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
+            /*    SharedPreferences.Editor editor = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
                 editor.putString("cpImage", bitmapToString(cpImageAsBitmap));
-                editor.apply();
+                editor.apply();*/
 
                 photoLLTextView.setText("Remove photo");
                 postButton.setTextColor(Color.BLACK);
@@ -395,23 +408,33 @@ public class CreatePostActivity extends AppCompatActivity {
     }
 
     public void includeEvent() {
-        Intent intent = new Intent(getApplicationContext(), IncludeEventActivity.class);
-        intent.putExtra("from", "create");
-        startActivity(intent);
+       viewPager.setCurrentItem(0);
+        optionsLL.setVisibility(View.GONE);
+        scrollView.setVisibility(View.GONE);
+       viewPager.setVisibility(View.VISIBLE);
+
     }
 
     public void tagColleague() {
-        Intent intent = new Intent(getApplicationContext(), TagColleagueActivity.class);
-        intent.putExtra("from", "create");
-        startActivity(intent);
+      viewPager.setCurrentItem(1);
+        optionsLL.setVisibility(View.GONE);
+        scrollView.setVisibility(View.GONE);
+      viewPager.setVisibility(View.VISIBLE);
+
     }
 
     public void specifyDepartment() {
-        Intent intent = new Intent(getApplicationContext(), PostLevelActivity.class);
-        intent.putExtra("from", "create");
-        startActivity(intent);
+       viewPager.setCurrentItem(2);
+        optionsLL.setVisibility(View.GONE);
+        scrollView.setVisibility(View.GONE);
+       viewPager.setVisibility(View.VISIBLE);
     }
-
+  public void returnViewToTheParentActivity(){
+      eventsTextView.setText(events);
+      viewPager.setVisibility(View.GONE);
+      optionsLL.setVisibility(View.VISIBLE);
+      scrollView.setVisibility(View.VISIBLE);
+  }
     public void showPostLevel(View view) {
         if (checkedDepartments == null) {
             checkedDepartments = "None";

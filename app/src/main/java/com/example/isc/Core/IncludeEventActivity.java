@@ -1,22 +1,21 @@
 package com.example.isc.Core;
 
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
-import android.text.Html;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.example.isc.R;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
-public class IncludeEventActivity extends AppCompatActivity {
+public class IncludeEventActivity extends  Fragment {
 
     ArrayList<String> eventsList;
     IncludeEventAdapter includeEventAdapter;
@@ -24,23 +23,13 @@ public class IncludeEventActivity extends AppCompatActivity {
     Button includeEventButton;
     static ArrayList<String> includedEvents;
 
-    String from;
+    View view;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_include_event);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view= inflater.inflate(R.layout.activity_include_event,container,false);
 
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(
-                Html.fromHtml("<font color=\"#1976D2\"> Include Event </font>")
-        );
-        getSupportActionBar().setDisplayShowTitleEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_24dp);
-
-        if(getIntent().getStringExtra("from") != null){
-            from = getIntent().getStringExtra("from");
-        }
 
         eventsList = new ArrayList<String>(){{
             add("INETech");
@@ -49,11 +38,11 @@ public class IncludeEventActivity extends AppCompatActivity {
             add("Indjaz");
         }};
         includedEvents = new ArrayList<>();
-        includeEventAdapter = new IncludeEventAdapter(getApplicationContext(), R.layout.activity_include_event_list_adapter, eventsList);
-        eventsListView = findViewById(R.id.eventsListView);
+        includeEventAdapter = new IncludeEventAdapter(getActivity().getApplicationContext(), R.layout.activity_include_event_list_adapter, eventsList);
+        eventsListView = view.findViewById(R.id.eventsListView);
         eventsListView.setAdapter(includeEventAdapter);
 
-        includeEventButton = findViewById(R.id.includeEventButton);
+        includeEventButton = view.findViewById(R.id.includeEventButton);
         includeEventButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -63,37 +52,12 @@ public class IncludeEventActivity extends AppCompatActivity {
                     events.append(includedEvents.get(i));
                     events.append(" ");
                 }
-                if (from.equals("create")){
-                    CreatePostActivity.events = events.toString();
-                    startActivity(new Intent(getApplicationContext(), CreatePostActivity.class));
-                }else if(from.equals("edit")){
-                    EditPostActivity.epEvents = events.toString();
-                    startActivity(new Intent(getApplicationContext(), EditPostActivity.class));
-                }
+                ((CreatePostActivity)getActivity()).events=events.toString();
+                ((CreatePostActivity)getActivity()).returnViewToTheParentActivity();
             }
         });
-    }
-    @Override
-    public void onBackPressed() {
-        new AlertDialog.Builder(this)
-                .setTitle("Discard the selection")
-                .setMessage("Are you sure you want to discard the selection?")
-                .setPositiveButton("Discard", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        if(from.equals("create")){
-                            startActivity(new Intent(getApplicationContext(), CreatePostActivity.class));
-                        }else if(from.equals("edit")){
-                            startActivity(new Intent(getApplicationContext(), EditPostActivity.class));
-                        }
-                    }
-                })
-                .setNegativeButton(android.R.string.no, null)
-                .show();
+        return view;
     }
 
-    @Override
-    public boolean onSupportNavigateUp(){
-        onBackPressed();
-        return true;
-    }
+
 }

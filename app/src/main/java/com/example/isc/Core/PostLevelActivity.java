@@ -1,45 +1,34 @@
 package com.example.isc.Core;
 
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
-import android.text.Html;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.example.isc.R;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
-public class PostLevelActivity extends AppCompatActivity {
+public class PostLevelActivity extends Fragment {
     ArrayList<String> postLevelList;
     PostLevelAdapter adapter;
     ListView postLevelListView;
     Button postLevelButton;
     static ArrayList<String> includedDepartments;
 
-    String from;
 
+
+    View view;
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_post_level);
-
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(
-                Html.fromHtml("<font color=\"#1976D2\"> Departments </font>")
-        );
-        getSupportActionBar().setDisplayShowTitleEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_24dp);
-
-        if(getIntent().getStringExtra("from") != null){
-            from = getIntent().getStringExtra("from");
-        }
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+       view=inflater.inflate(R.layout.activity_post_level,container,false);
 
         postLevelList = new ArrayList<String>(){{
             add("Communication");
@@ -49,11 +38,11 @@ public class PostLevelActivity extends AppCompatActivity {
             add("Exterior Relations");
         }};
         includedDepartments = new ArrayList<>();
-        adapter = new PostLevelAdapter(getApplicationContext(), R.layout.activity_post_level_list_adapter, postLevelList);
-        postLevelListView = findViewById(R.id.postLevelListView);
+        adapter = new PostLevelAdapter(getActivity().getApplicationContext(), R.layout.activity_post_level_list_adapter, postLevelList);
+        postLevelListView = view.findViewById(R.id.postLevelListView);
         postLevelListView.setAdapter(adapter);
 
-        postLevelButton = findViewById(R.id.postLevelButton);
+        postLevelButton = view.findViewById(R.id.postLevelButton);
         postLevelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -62,38 +51,14 @@ public class PostLevelActivity extends AppCompatActivity {
                     departments.append(includedDepartments.get(i));
                     departments.append("\n");
                 }
-                if(from.equals("create")){
-                    CreatePostActivity.checkedDepartments = departments.toString();
-                    startActivity(new Intent(getApplicationContext(), CreatePostActivity.class));
-                }else if(from.equals("edit")){
-                    EditPostActivity.epCheckedDepartments = departments.toString();
-                    startActivity(new Intent(getApplicationContext(), EditPostActivity.class));
-                }
+                ((CreatePostActivity)getActivity()).checkedDepartments=departments.toString();
+                ((CreatePostActivity)getActivity()).returnViewToTheParentActivity();
 
             }
         });
-    }
-    @Override
-    public void onBackPressed() {
-        new AlertDialog.Builder(this)
-                .setTitle("Discard the selection")
-                .setMessage("Are you sure you want to discard the selection?")
-                .setPositiveButton("Discard", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        if(from.equals("create")){
-                            startActivity(new Intent(getApplicationContext(), CreatePostActivity.class));
-                        }else if(from.equals("edit")){
-                            startActivity(new Intent(getApplicationContext(), EditPostActivity.class));
-                        }
-                    }
-                })
-                .setNegativeButton(android.R.string.no, null)
-                .show();
+        return view;
     }
 
-    @Override
-    public boolean onSupportNavigateUp(){
-        onBackPressed();
-        return true;
-    }
+
+
 }

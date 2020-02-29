@@ -1,23 +1,22 @@
 package com.example.isc.Core;
 
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
-import android.text.Html;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SearchView;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.example.isc.R;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
-public class TagColleagueActivity extends AppCompatActivity {
+public class TagColleagueActivity extends Fragment {
 
     static ArrayList<String> taggedColleagues;
     ArrayList<MyUser> colleagues;
@@ -26,23 +25,13 @@ public class TagColleagueActivity extends AppCompatActivity {
     Button tagColleagueButton;
     SearchView searchColleague;
 
-    String from;
 
+    View view;
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tag_colleague);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        view=inflater.inflate(R.layout.activity_tag_colleague,container,false);
 
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(
-                Html.fromHtml("<font color=\"#1976D2\"> Tag a colleague </font>")
-        );
-        getSupportActionBar().setDisplayShowTitleEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_24dp);
-
-        if(getIntent().getStringExtra("from") != null){
-            from = getIntent().getStringExtra("from");
-        }
 
         taggedColleagues = new ArrayList<>();
         colleagues = new ArrayList<MyUser>(){{
@@ -54,11 +43,11 @@ public class TagColleagueActivity extends AppCompatActivity {
             add(new MyUser("Garbage",null, "Nedjem Eddine", "Head"));
             add(new MyUser("Garbage",null, "Saad Eddine", "Member"));
         }};
-        tagColleagueAdapter = new TagColleagueAdapter(getApplicationContext(), R.layout.activity_tag_colleague_list_adapter, colleagues);
-        colleagueListView = findViewById(R.id.colleagueListView);
+        tagColleagueAdapter = new TagColleagueAdapter(getActivity().getApplicationContext(), R.layout.activity_tag_colleague_list_adapter, colleagues);
+        colleagueListView = view.findViewById(R.id.colleagueListView);
         colleagueListView.setAdapter(tagColleagueAdapter);
 
-        tagColleagueButton = findViewById(R.id.tagColleagueButton);
+        tagColleagueButton = view.findViewById(R.id.tagColleagueButton);
         tagColleagueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -68,17 +57,12 @@ public class TagColleagueActivity extends AppCompatActivity {
                     tagColleague.append(taggedColleagues.get(i));
                     tagColleague.append("\n");
                 }
-                if(from.equals("create")){
-                    CreatePostActivity.colleagues = tagColleague.toString();
-                    startActivity(new Intent(getApplicationContext(), CreatePostActivity.class));
-                }else if(from.equals("edit")){
-                    EditPostActivity.epColleagues = tagColleague.toString();
-                    startActivity(new Intent(getApplicationContext(), CreatePostActivity.class));
-                }
+                ((CreatePostActivity)getActivity()).colleagues=tagColleague.toString();
+                ((CreatePostActivity)getActivity()).returnViewToTheParentActivity();
 
             }
         });
-        searchColleague = findViewById(R.id.searchColleague);
+        searchColleague =view.findViewById(R.id.searchColleague);
         searchColleague.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -91,28 +75,9 @@ public class TagColleagueActivity extends AppCompatActivity {
                 return true;
             }
         });
-    }
-    @Override
-    public void onBackPressed() {
-        new AlertDialog.Builder(this)
-                .setTitle("Discard the selection")
-                .setMessage("Are you sure you want to discard the selection?")
-                .setPositiveButton("Discard", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        if(from.equals("create")){
-                            startActivity(new Intent(getApplicationContext(), CreatePostActivity.class));
-                        }else if(from.equals("edit")){
-                            startActivity(new Intent(getApplicationContext(), EditPostActivity.class));
-                        }
-                    }
-                })
-                .setNegativeButton(android.R.string.no, null)
-                .show();
+
+        return view;
     }
 
-    @Override
-    public boolean onSupportNavigateUp(){
-        onBackPressed();
-        return true;
-    }
+
 }
