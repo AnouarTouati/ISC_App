@@ -1,6 +1,8 @@
 package com.example.isc.Core.Fragments;
 
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +25,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,41 +46,7 @@ public class NotificationFragment extends Fragment {
 
         firebaseFirestore=FirebaseFirestore.getInstance();
         firebaseStorage=FirebaseStorage.getInstance();
-        /*
-        MyUser myUser0 = new MyUser(R.drawable.img0, "Zineddine", "Head");
-        MyUser myUser1 = new MyUser(R.drawable.img0, "Mohamed", "Member");
-        MyUser myUser2 = new MyUser(R.drawable.img0, "Islem", "Head");
-        MyUser myUser3 = new MyUser(R.drawable.img0, "Bettouche", "Member");
 
-        final MyNotification myNotification0 = new MyNotification(
-                myUser0,
-                "added a photo in the department of communication",
-                "20 minutes ago"
-        );
-        final MyNotification myNotification1 = new MyNotification(
-                myUser1,
-                "added workshop idea in the department of HR",
-                "7 minutes ago"
-        );
-        final MyNotification myNotification2 = new MyNotification(
-                myUser2,
-                "liked a photo in the department of logistics",
-                "2 hours ago"
-        );
-        final MyNotification myNotification3 = new MyNotification(
-                myUser3,
-                "added a photo in the department of communication",
-                "9 minutes ago"
-        );
-
-
-        notificationArrayList = new ArrayList<MyNotification>(){{
-            add(myNotification0);
-            add(myNotification1);
-            add(myNotification2);
-            add(myNotification3);
-        }};
-*/
         notificationListAdapter = new NotificationListAdapter(getContext(), R.layout.activity_notification_list_adapter, notificationArrayList);
         notificationListView = fragmentView.findViewById(R.id.notificationListView);
         notificationListView.setAdapter(notificationListAdapter);
@@ -99,17 +68,17 @@ public class NotificationFragment extends Fragment {
          public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                  notificationArrayList.clear();
                  List<DocumentSnapshot> notificationSnaps= queryDocumentSnapshots.getDocuments();
-                 for(DocumentSnapshot snap :notificationSnaps){
-                     String userID=snap.get("userID").toString();
-                     String notificationText=snap.get("notificationText").toString();
-                     String notificationTime=snap.get("notificationTime").toString();
-                     getUserProfileAndAddNotification(userID,notificationText,notificationTime);
+                 for(int i=0;i<notificationSnaps.size();i++){
+                     String userID=notificationSnaps.get(i).get("userID").toString();
+                     String notificationText=notificationSnaps.get(i).get("notificationText").toString();
+                     String notificationTime=notificationSnaps.get(i).get("notificationTime").toString();
+                     getUserProfileAndAddNotification(userID,notificationText,notificationTime,i);
                  }
 
          }
      });
     }
-  void getUserProfileAndAddNotification(final String userID, final String notificationText, final String notificationTime){
+  void getUserProfileAndAddNotification(final String userID, final String notificationText, final String notificationTime, final int arrayListIndex){
         firebaseFirestore.collection("Profiles").document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -118,8 +87,37 @@ public class NotificationFragment extends Fragment {
                MyNotification notification=new MyNotification(user,notificationText,notificationTime);
                notificationArrayList.add(notification);
                dataUpdatedNotifyListView();
+               getUserProfileImage(task.getResult().get("profileImageReferenceInStorage").toString(),arrayListIndex);
             }
         }});
+  }
+  void getUserProfileImage(String storageReferencePath, final int arrayListIndex){
+        //if we don't have a valid path to storage we don't do anything since the Notification is there no exception will occur
+        if(storageReferencePath!=null){
+            if(!storageReferencePath.equals("")) {
+                StorageReference imageReference=firebaseStorage.getReference();
+                imageReference=imageReference.child(storageReferencePath);
+
+                imageReference.getBytes(6* Common.ONE_MEGA_BYTE).addOnCompleteListener(new OnCompleteListener<byte[]>() {
+                    @Override
+                    public void onComplete(@NonNull Task<byte[]> task) {
+                        if(task.isSuccessful()){
+
+                                MyNotification aNotification =notificationArrayList.get(arrayListIndex);
+                                aNotification.getMyUser().setProfileImageBitmap(BitmapFactory.decodeByteArray(task.getResult().clone(),0,task.getResult().length));
+                                notificationArrayList.remove(arrayListIndex);
+                                notificationArrayList.add(arrayListIndex,aNotification);
+                                dataUpdatedNotifyListView();
+                            }
+
+                        else{
+                            Log.d("ConnectivityFireBase", "Something went wrong and we couldn't get images "+task.getException().toString());
+                        }
+                    }
+                });
+            }
+        }
+
   }
    void dataUpdatedNotifyListView(){
        notificationListAdapter = new NotificationListAdapter(getContext(), R.layout.activity_notification_list_adapter, notificationArrayList);

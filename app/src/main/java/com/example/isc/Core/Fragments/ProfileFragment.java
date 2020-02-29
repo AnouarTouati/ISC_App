@@ -39,6 +39,7 @@ import com.google.firebase.storage.StorageReference;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class ProfileFragment extends Fragment {
@@ -281,13 +282,14 @@ public class ProfileFragment extends Fragment {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     postArrayList.clear();
-                    for (DocumentSnapshot snapshot : task.getResult().getDocuments()) {
-                        String cpText = snapshot.get("cpText").toString();
-                        String checkedDepartments = snapshot.get("checkedDepartments").toString();
-                        String colleagues = snapshot.get("colleagues").toString();
-                        String events = snapshot.get("events").toString();
+                    List<DocumentSnapshot> snapshots=task.getResult().getDocuments();
+                    for (int i=0;i<snapshots.size();i++) {
+                        String cpText = snapshots.get(i).get("cpText").toString();
+                        String checkedDepartments = snapshots.get(i).get("checkedDepartments").toString();
+                        String colleagues = snapshots.get(i).get("colleagues").toString();
+                        String events = snapshots.get(i).get("events").toString();
                         postArrayList.add(new MyPost(myUser0, cpText, null, checkedDepartments, colleagues, events));
-                        String imageReferenceInStorage=snapshot.get("imageReferenceInStorage").toString();
+                        String imageReferenceInStorage=snapshots.get(i).get("imageReferenceInStorage").toString();
                         getImageFromServer(imageReferenceInStorage,postArrayList.size()-1/*aka index where the image should be placed*/);
                     }
                     dataUpdatedNotifyListView();
@@ -306,35 +308,46 @@ public class ProfileFragment extends Fragment {
     }
 
    void getImageFromServer(String storageReferencePath, final int postArrayListIndex){
-       StorageReference imageReference=firebaseStorage.getReference();
-       imageReference=imageReference.child(storageReferencePath);
 
-       imageReference.getBytes(6* Common.ONE_MEGA_BYTE).addOnCompleteListener(new OnCompleteListener<byte[]>() {
-           @Override
-           public void onComplete(@NonNull Task<byte[]> task) {
-                if(task.isSuccessful()){
-                    if(postArrayListIndex!=-1/*aka a post image*/){
-                        MyPost aPost=postArrayList.get(postArrayListIndex);
-                        aPost.setPostedImage(BitmapFactory.decodeByteArray(task.getResult().clone(),0,task.getResult().length));
-                        postArrayList.remove(postArrayListIndex);
-                        postArrayList.add(postArrayListIndex,aPost);
-                        dataUpdatedNotifyListView();
-                    }else if (postArrayListIndex==-1/*aka the profile image*/){
-                        profileImageAsBitmap=BitmapFactory.decodeByteArray(task.getResult().clone(),0,task.getResult().length);
-                        profileImage.setImageBitmap(profileImageAsBitmap);
-                        //the below statements must stay in order and here since we want to use myUser0 to instantiate the post
-                        myUser0.setProfileImageBitmap(profileImageAsBitmap);
-                        getUserPosts();
-                    }
+       if(storageReferencePath!=null) {
+           if (!storageReferencePath.equals("")) {
 
-                }
-                else{
-                    Log.d("ConnectivityFireBase", "Something went wrong and we couldn't get images "+task.getException().toString());
-                }
-           }
-       });
+               StorageReference imageReference = firebaseStorage.getReference();
+               imageReference = imageReference.child(storageReferencePath);
+
+               imageReference.getBytes(6 * Common.ONE_MEGA_BYTE).addOnCompleteListener(new OnCompleteListener<byte[]>() {
+                   @Override
+                   public void onComplete(@NonNull Task<byte[]> task) {
+                       if (task.isSuccessful()) {
+                           if (postArrayListIndex != -1/*aka a post image*/) {
+                               MyPost aPost = postArrayList.get(postArrayListIndex);
+                               aPost.setPostedImage(BitmapFactory.decodeByteArray(task.getResult().clone(), 0, task.getResult().length));
+                               postArrayList.remove(postArrayListIndex);
+                               postArrayList.add(postArrayListIndex, aPost);
+                               dataUpdatedNotifyListView();
+                           } else if (postArrayListIndex == -1/*aka the profile image*/) {
+                               profileImageAsBitmap = BitmapFactory.decodeByteArray(task.getResult().clone(), 0, task.getResult().length);
+                               profileImage.setImageBitmap(profileImageAsBitmap);
+                               //the below statements must stay in order and here since we want to use myUser0 to instantiate the post
+                               myUser0.setProfileImageBitmap(profileImageAsBitmap);
+                               getUserPosts();
+                           }
+
+                       } else {
+                           Log.d("ConnectivityFireBase", "Something went wrong and we couldn't get images " + task.getException().toString());
+                       }
+                   }
+               });
+           } else{addPostToArrayListWithoutImage(postArrayListIndex);}
+       }else {addPostToArrayListWithoutImage(postArrayListIndex);}
    }
-
+void addPostToArrayListWithoutImage(int postArrayListIndex){
+    MyPost aPost = postArrayList.get(postArrayListIndex);
+    aPost.setPostedImage(null);
+    postArrayList.remove(postArrayListIndex);
+    postArrayList.add(postArrayListIndex, aPost);
+    dataUpdatedNotifyListView();
+}
     public void selectImage() {
         Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
         getIntent.setType("image/*");

@@ -1,7 +1,11 @@
 import * as functions from 'firebase-functions';
-import admin = require('firebase-admin');
+import * as admin from 'firebase-admin'
 
 // // Start writing Firebase Functions
 // // https://firebase.google.com/docs/functions/typescript
-admin.initializeApp()
 
+export const onNotification=
+functions.firestore.document("Notifications").onUpdate(change =>{
+
+ 
+})

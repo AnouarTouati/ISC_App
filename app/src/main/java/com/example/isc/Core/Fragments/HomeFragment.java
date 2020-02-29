@@ -136,10 +136,10 @@ public class HomeFragment extends Fragment {
                   if(task.isSuccessful()){
                       allUsersProfiles.clear();
                     List<DocumentSnapshot> allProfiles=task.getResult().getDocuments();
-                      for (DocumentSnapshot snap : allProfiles){
-                          MyUser user=new MyUser(snap.getId(),null,snap.get("name").toString(), Common.position[snap.getLong("position").intValue()]);
+                      for(int i=0;i<allProfiles.size();i++){
+                          MyUser user=new MyUser(allProfiles.get(i).getId(),null,allProfiles.get(i).get("name").toString(), Common.position[allProfiles.get(i).getLong("position").intValue()]);
                           allUsersProfiles.add(user);
-                           getImageFromServer(snap.get("profileImageReferenceInStorage").toString(),allUsersProfiles.size()-1,true);
+                           getImageFromServer(allProfiles.get(i).get("profileImageReferenceInStorage").toString(),allUsersProfiles.size()-1,true);
                       }
                       getUserPosts();
                   }else{
@@ -183,41 +183,57 @@ public class HomeFragment extends Fragment {
 
     }
     void getImageFromServer(String storageReferencePath, final int arrayListIndex, final boolean aProfileImage){
-        StorageReference imageReference=firebaseStorage.getReference();
-        imageReference=imageReference.child(storageReferencePath);
+        if(storageReferencePath!=null){
+        if(!storageReferencePath.equals("")){
 
-        imageReference.getBytes(6* Common.ONE_MEGA_BYTE).addOnCompleteListener(new OnCompleteListener<byte[]>() {
-            @Override
-            public void onComplete(@NonNull Task<byte[]> task) {
-                if(task.isSuccessful()){
-                    if(!aProfileImage){
-                        MyPost aPost=postArrayList.get(arrayListIndex);
-                        aPost.setPostedImage(BitmapFactory.decodeByteArray(task.getResult().clone(),0,task.getResult().length));
-                        postArrayList.remove(arrayListIndex);
-                        postArrayList.add(arrayListIndex,aPost);
-                        dataUpdatedNotifyListView();
-                    }else{
-                       int postIndex= findIndexOfThePostWithThisUserProfile(allUsersProfiles.get(arrayListIndex));
-                       if(postIndex!=-1){
-                           allUsersProfiles.get(arrayListIndex).setProfileImageBitmap((BitmapFactory.decodeByteArray(task.getResult().clone(),0,task.getResult().length)));
-                           postArrayList.get(postIndex).setMyUser(allUsersProfiles.get(arrayListIndex));
-                           dataUpdatedNotifyListView();
-                           Log.v("ConnectivityFireBase", "Received Profile pic successfully for home ");
-                       }else{
-                           //one solution is to get the posts first anyway i will figure that out later
-                           Log.v("ConnectivityFireBase","we loaded profile pic of a user who doesn't have a post aka wasted mobile data");
-                       }
+            StorageReference imageReference=firebaseStorage.getReference();
+            imageReference=imageReference.child(storageReferencePath);
+
+            imageReference.getBytes(6* Common.ONE_MEGA_BYTE).addOnCompleteListener(new OnCompleteListener<byte[]>() {
+                @Override
+                public void onComplete(@NonNull Task<byte[]> task) {
+                    if(task.isSuccessful()){
+                        if(!aProfileImage){
+                            MyPost aPost=postArrayList.get(arrayListIndex);
+                            aPost.setPostedImage(BitmapFactory.decodeByteArray(task.getResult().clone(),0,task.getResult().length));
+                            postArrayList.remove(arrayListIndex);
+                            postArrayList.add(arrayListIndex,aPost);
+                            dataUpdatedNotifyListView();
+                        }else{
+                            int postIndex= findIndexOfThePostWithThisUserProfile(allUsersProfiles.get(arrayListIndex));
+                            if(postIndex!=-1){
+                                allUsersProfiles.get(arrayListIndex).setProfileImageBitmap((BitmapFactory.decodeByteArray(task.getResult().clone(),0,task.getResult().length)));
+                                postArrayList.get(postIndex).setMyUser(allUsersProfiles.get(arrayListIndex));
+                                dataUpdatedNotifyListView();
+                                Log.v("ConnectivityFireBase", "Received Profile pic successfully for home ");
+                            }else{
+                                //one solution is to get the posts first anyway i will figure that out later
+                                Log.v("ConnectivityFireBase","we loaded profile pic of a user who doesn't have a post aka wasted mobile data");
+                            }
+
+                        }
 
                     }
+                    else{
+                        Log.d("ConnectivityFireBase", "Something went wrong and we couldn't get images "+task.getException().toString());
+                    }
+                }
+            });
+        }else{
+            addPostToArrayListWithoutImage(arrayListIndex);
+        }
 
-                }
-                else{
-                    Log.d("ConnectivityFireBase", "Something went wrong and we couldn't get images "+task.getException().toString());
-                }
-            }
-        });
+        }else{
+            addPostToArrayListWithoutImage(arrayListIndex);}
+
     }
-
+ void addPostToArrayListWithoutImage(int arrayListIndex){
+     MyPost aPost=postArrayList.get(arrayListIndex);
+     aPost.setPostedImage(null);
+     postArrayList.remove(arrayListIndex);
+     postArrayList.add(arrayListIndex,aPost);
+     dataUpdatedNotifyListView();
+ }
 
     int findIndexOfThePostWithThisUserProfile(MyUser aUser){
         for (int i=0;i<postArrayList.size();i++){

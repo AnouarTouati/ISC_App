@@ -94,9 +94,15 @@ public class ProfilePostsListAdapter extends ArrayAdapter<MyPost> {
             }
             if (postedImage != null) {
                // holder.postedImage.setImageResource(post.getPostedImage());
-                holder.postedImage.setImageBitmap(post.getPostedImageBitmap());
-                holder.postedImage.setDrawingCacheEnabled(true);
+                if(post.getPostedImageBitmap()!=null){
+                    holder.postedImage.setImageBitmap(post.getPostedImageBitmap());
+                    holder.postedImage.setDrawingCacheEnabled(true);
+                }else{
+                    holder.postedImage.setVisibility(View.GONE);
+                }
+
             }
+
             if (postLevelButton != null) {
                 holder.postLevelButton.setOnClickListener(new View.OnClickListener() {
                     @Override

@@ -32,8 +32,10 @@ import com.example.isc.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageException;
@@ -65,12 +67,18 @@ public class CreatePostActivity extends AppCompatActivity {
 
     ProgressDialog progressDialog;
 
+
+    FirebaseFirestore firebaseFirestore;
+    FirebaseUser firebaseUser;
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_post);
 
+        firebaseFirestore = FirebaseFirestore.getInstance();
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         progressDialog = new ProgressDialog(this);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
@@ -164,8 +172,6 @@ public class CreatePostActivity extends AppCompatActivity {
             progressDialog.setMessage("Posting...");
             progressDialog.show();
 
-            FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
-            final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
             final Map<String, Object> map = new HashMap<>();
             map.put("checkedDepartments", checkedDepartments);
@@ -173,6 +179,7 @@ public class CreatePostActivity extends AppCompatActivity {
             map.put("colleagues", colleagues);
             map.put("cpText", cpEditText.getText().toString());
             map.put("postID", UUID.randomUUID().toString());
+            map.put("date", Timestamp.now());
             if (cpImageAsBitmap != null) {
                 map.put("imageReferenceInStorage", "images/" + firebaseUser.getUid() + "/" + map.get("postID") + ".JPEG");
             } else {
@@ -185,15 +192,16 @@ public class CreatePostActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
+
                                 if (cpImageAsBitmap == null) {
                                     progressDialog.dismiss();
                                     Toast.makeText(getApplicationContext(), "Posted", Toast.LENGTH_LONG).show();
                                     Log.v("ConnectivityFireBase", "Posted Successfully");
-                                    goBackToCoreActivity();
+
                                 } else {
                                     PushPostImageToServer(map.get("imageReferenceInStorage").toString(), cpImageAsBitmap, map.get("postID").toString());
                                 }
-
+                                createNotificationDataOnServer(checkedDepartments,map.get("postID").toString());
                             } else {
                                 progressDialog.dismiss();
                                 Toast.makeText(getApplicationContext(), "Something went wrong we couldn't post", Toast.LENGTH_LONG).show();
@@ -212,6 +220,36 @@ public class CreatePostActivity extends AppCompatActivity {
         }
     }
 
+    void createNotificationDataOnServer(final String checkedDepartments, String postID){
+        firebaseFirestore.collection("AllPosts").document(/*aka users*/firebaseUser.getUid()).collection("userPosts").document(postID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                Map<String,Object> map=new HashMap<>();
+                map.put("userID",firebaseUser.getUid());
+                map.put("notificationText","has posted in the department of "+checkedDepartments);
+
+
+                    if(Objects.requireNonNull(task.getResult()).contains("date")){
+                        map.put("notificationTime", Objects.requireNonNull(task.getResult().getTimestamp("date")).toDate().toString());
+
+                    }
+                    else{
+                        map.put("notificationTime","");
+                    }
+
+                firebaseFirestore.collection("Notifications").document(firebaseUser.getUid()).set(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful()){
+                            Toast.makeText(getApplicationContext(),"Notification was sent to all users",Toast.LENGTH_LONG).show();
+                            goBackToCoreActivity();
+                        }
+                    }
+                });
+            }
+        });
+
+    }
     void PushPostImageToServer(String imageReferenceInStorage, Bitmap imageToPush, final String postID) {
         FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
         StorageReference imageReference = firebaseStorage.getReference();

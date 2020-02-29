@@ -89,8 +89,12 @@ public class HomeListAdapter extends ArrayAdapter<MyPost> {
                 holder.posterProfileImage.setDrawingCacheEnabled(true);
             }
             if (postedImage != null) {
-                holder.postedImage.setImageBitmap(post.getPostedImageBitmap());
-                holder.postedImage.setDrawingCacheEnabled(true);
+                if(post.getPostedImageBitmap()!=null) {
+                    holder.postedImage.setImageBitmap(post.getPostedImageBitmap());
+                    holder.postedImage.setDrawingCacheEnabled(true);
+                }else{
+                    holder.postedImage.setVisibility(View.GONE);
+                }
             }
             if (postLevelButton != null) {
                 holder.postLevelButton.setOnClickListener(new View.OnClickListener() {
