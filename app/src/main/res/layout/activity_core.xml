@@ -7,64 +7,60 @@
     tools:context=".Core.CoreActivity"
     android:orientation="vertical">
 
-    <FrameLayout
-        android:id="@+id/fragmentsFrame"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/bottomTabGrid"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintHeight_percent="0.9"
-        app:layout_constraintVertical_bias="0"/>
 
-    <GridLayout
-        android:id="@+id/bottomTabGrid"
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/coreActivityViewPager"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="@drawable/tab_grid_background"
+        android:layout_height="550dp"
+        android:visibility="visible"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/coreActivityTabLayout"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintVertical_bias="0"
+        > </androidx.viewpager.widget.ViewPager>
+
+    <com.google.android.material.tabs.TabLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:id="@+id/coreActivityTabLayout"
+        app:layout_constraintTop_toBottomOf="@id/coreActivityViewPager"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintHeight_percent="0.1"
-        app:layout_constraintVertical_bias="1"
-        android:columnCount="4"
-        android:rowCount="1"
-        android:rowOrderPreserved="true"
-        android:alignmentMode="alignBounds"
-        android:elevation="10dp">
-        <ImageButton
-            android:src="@drawable/ic_home_blue_24dp"
-            android:onClick="switchFragment"
-            android:id="@+id/homeTabButton"
-            android:background="@drawable/tab_button_background"
-            android:layout_column="0"
-            android:layout_row="0"
-            android:layout_columnWeight="1"
-            android:layout_gravity="fill_horizontal|fill_vertical"
-            android:gravity="center"/>
-        <ImageButton
-            android:src="@drawable/ic_notifications_black_24dp"
-            android:onClick="switchFragment"
-            android:id="@+id/notificationTabButton"
-            android:background="@drawable/tab_button_background"
-            android:layout_column="2"
-            android:layout_row="0"
-            android:layout_columnWeight="1"
-            android:layout_gravity="fill_horizontal|fill_vertical"
-            android:gravity="center"/>
-        <ImageButton
-            android:src="@drawable/ic_person_black_24dp"
-            android:onClick="switchFragment"
-            android:id="@+id/profileTabButton"
-            android:background="@drawable/tab_button_background"
-            android:layout_column="3"
-            android:layout_row="0"
-            android:layout_columnWeight="1"
-            android:layout_gravity="fill_horizontal|fill_vertical"
-            android:gravity="center"/>
-    </GridLayout>
+        android:background="@drawable/tab_grid_background"
+        android:visibility="visible"
+        >
 
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/tab_button_background"
+            android:icon="@drawable/ic_home_blue_24dp"
+            >
+
+        </com.google.android.material.tabs.TabItem>
+
+        <com.google.android.material.tabs.TabItem
+            android:icon="@drawable/ic_notifications_black_24dp"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:background="@drawable/tab_button_background"
+
+        >
+        </com.google.android.material.tabs.TabItem>
+
+
+        <com.google.android.material.tabs.TabItem
+            android:icon="@drawable/ic_person_black_24dp"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:background="@drawable/tab_button_background"
+
+            >
+        </com.google.android.material.tabs.TabItem>
+
+    </com.google.android.material.tabs.TabLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
