@@ -14,13 +14,14 @@ import androidx.fragment.app.Fragment;
 import com.example.isc.R;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class IncludeEventActivity extends  Fragment {
 
-    ArrayList<String> eventsList;
-    IncludeEventAdapter includeEventAdapter;
-    ListView eventsListView;
-    Button includeEventButton;
+    private  ArrayList<String> eventsList;
+    private  IncludeEventAdapter includeEventAdapter;
+    private ListView eventsListView;
+    private Button includeEventButton;
     static ArrayList<String> includedEvents;
 
     View view;
@@ -38,7 +39,7 @@ public class IncludeEventActivity extends  Fragment {
             add("Indjaz");
         }};
         includedEvents = new ArrayList<>();
-        includeEventAdapter = new IncludeEventAdapter(getActivity().getApplicationContext(), R.layout.activity_include_event_list_adapter, eventsList);
+        includeEventAdapter = new IncludeEventAdapter(Objects.requireNonNull(getActivity()).getApplicationContext(), R.layout.activity_include_event_list_adapter, eventsList);
         eventsListView = view.findViewById(R.id.eventsListView);
         eventsListView.setAdapter(includeEventAdapter);
 
@@ -52,8 +53,18 @@ public class IncludeEventActivity extends  Fragment {
                     events.append(includedEvents.get(i));
                     events.append(" ");
                 }
-                ((CreatePostActivity)getActivity()).events=events.toString();
-                ((CreatePostActivity)getActivity()).returnViewToTheParentActivity();
+                if(getActivity()!=null){
+                    if(getActivity() instanceof  CreatePostActivity){
+                        ((CreatePostActivity)getActivity()).events=events.toString();
+                        ((CreatePostActivity)getActivity()).returnViewToTheParentActivity();
+                    }
+                    else if ( getActivity() instanceof  EditPostActivity){
+                        ((EditPostActivity)getActivity()).epEvents=events.toString();
+                        ((EditPostActivity)getActivity()).returnViewToTheParentActivity();
+                    }
+                }
+
+
             }
         });
         return view;

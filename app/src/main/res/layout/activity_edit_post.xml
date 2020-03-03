@@ -78,7 +78,7 @@
                     android:layout_height="match_parent"
                     android:background="@drawable/white_background_no_border"
                     android:text="@string/edit"
-                    android:onClick="post"
+                    android:onClick="editPost"
                     android:elevation="0dp"/>
             </LinearLayout>
             <TextView
@@ -200,4 +200,11 @@
                 android:gravity="center_vertical"/>
         </LinearLayout>
     </LinearLayout>
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/editPostViewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+    </androidx.viewpager.widget.ViewPager>
 </LinearLayout>

@@ -183,21 +183,7 @@
                                 android:layout_height="match_parent"
                                 android:textColor="#000000"
                                 android:textSize="16sp" />
-                            <EditText
-                                android:id="@+id/studentNumberEditText"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:textColor="#000000"
-                                android:textSize="14sp"
-                                android:visibility="gone"/>
                         </LinearLayout>
-                        <ImageView
-                            android:id="@+id/editStudentNumber"
-                            android:layout_width="0dp"
-                            android:layout_weight="0.2"
-                            android:layout_height="20dp"
-                            android:layout_gravity="center_vertical"
-                            android:src="@drawable/ic_edit_black_24dp"/>
                     </LinearLayout>
                 </LinearLayout>
                 <LinearLayout
@@ -224,11 +210,12 @@
                             android:layout_weight="0.8"
                             android:layout_height="wrap_content"
                             android:orientation="vertical">
+
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:text="Email"
-                                android:textSize="14sp"/>
+                                android:textSize="14sp" />
 
                             <TextView
                                 android:id="@+id/profileEmailTextView"
@@ -236,21 +223,7 @@
                                 android:layout_height="match_parent"
                                 android:textColor="#000000"
                                 android:textSize="14sp" />
-                            <EditText
-                                android:id="@+id/emailEditText"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:textColor="#000000"
-                                android:textSize="14sp"
-                                android:visibility="gone"/>
                         </LinearLayout>
-                        <ImageView
-                            android:id="@+id/editEmail"
-                            android:layout_width="0dp"
-                            android:layout_weight="0.2"
-                            android:layout_height="20dp"
-                            android:layout_gravity="center_vertical"
-                            android:src="@drawable/ic_edit_black_24dp"/>
                     </LinearLayout>
                 </LinearLayout>
                 <LinearLayout

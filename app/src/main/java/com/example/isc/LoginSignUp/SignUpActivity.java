@@ -24,7 +24,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SignUpActivity extends AppCompatActivity {
-    EditText signUpEmail, signUpPassword, signUpConfirmPassword;
+
+    private  EditText signUpEmail, signUpPassword, signUpConfirmPassword;
     private ProgressDialog progressDialog;
 
     private FirebaseAuth firebaseAuth;
@@ -55,12 +56,11 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     public void authenticateUser(View view){
-        //getting email and password from edit texts
+
         String email = signUpEmail.getText().toString();
         String password  = signUpPassword.getText().toString();
-        String confirmPassword  = signUpPassword.getText().toString();
+        String confirmPassword  = signUpConfirmPassword.getText().toString();
 
-        //checking if email and passwords are empty
         if(!isEmailValid(email)){
             Toast.makeText(this,"Invalid Email",Toast.LENGTH_LONG).show();
             return;
@@ -74,8 +74,6 @@ public class SignUpActivity extends AppCompatActivity {
             return;
         }
 
-        //if the email and password are not empty
-        //displaying a progress dialog
         progressDialog.setMessage("Signing up...");
         progressDialog.show();
 
@@ -93,7 +91,7 @@ public class SignUpActivity extends AppCompatActivity {
                             catch (FirebaseAuthException e){
 
                                 switch (e.getErrorCode()){
-                                    case  "ERROR_EMAIL_ALREADY_IN_USE" : Toast.makeText(getApplicationContext(),"This email is already registered.Did you forget your password?",Toast.LENGTH_LONG).show(); break;
+                                    case "ERROR_EMAIL_ALREADY_IN_USE" : Toast.makeText(getApplicationContext(),"This email is already registered.Did you forget your password?",Toast.LENGTH_LONG).show(); break;
                                     case "ERROR_INVALID_EMAIL" : Toast.makeText(getApplicationContext(),"Invalid Email ",Toast.LENGTH_LONG).show(); break;
                                     case "ERROR_WEAK_PASSWORD" :Toast.makeText(getApplicationContext(),"Your password is weak, please enter a new one",Toast.LENGTH_LONG).show(); break;
                                     default: Toast.makeText(getApplicationContext(),"Something went wrong and we couldn't sign you in",Toast.LENGTH_LONG).show();

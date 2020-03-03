@@ -11,26 +11,35 @@ import com.example.isc.Core.Fragments.HomeFragment;
 import com.example.isc.Core.Fragments.NotificationFragment;
 import com.example.isc.Core.Fragments.ProfileFragment;
 import com.example.isc.R;
+import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.Objects;
 
 public class CoreActivity extends AppCompatActivity {
 
-  TabLayout tabLayout;
-    ViewPager viewPager;
+    private TabLayout tabLayout;
+    private TabItem homeTabItem, notificationTabItem, profileTabItem;
+    private ViewPager viewPager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_core);
 
-          tabLayout=findViewById(R.id.coreActivityTabLayout);
-       viewPager=findViewById(R.id.coreActivityViewPager);
-       CreatePostViewPagerAdapter pagerAdapter=new CreatePostViewPagerAdapter(getSupportFragmentManager());
-       pagerAdapter.addFragment(new HomeFragment());
-       pagerAdapter.addFragment(new NotificationFragment());
-       pagerAdapter.addFragment(new ProfileFragment());
-       viewPager.setAdapter(pagerAdapter);
+        homeTabItem = findViewById(R.id.homeTabItem);
+        notificationTabItem = findViewById(R.id.notificationTabItem);
+        profileTabItem = findViewById(R.id.profileTabItem);
+
+        tabLayout = findViewById(R.id.coreActivityTabLayout);
+        viewPager = findViewById(R.id.coreActivityViewPager);
+
+        CreatePostViewPagerAdapter pagerAdapter = new CreatePostViewPagerAdapter(getSupportFragmentManager());
+        pagerAdapter.addFragment(new HomeFragment());
+        pagerAdapter.addFragment(new NotificationFragment());
+        pagerAdapter.addFragment(new ProfileFragment());
+
+        viewPager.setAdapter(pagerAdapter);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int i, float v, int i1) {
@@ -40,7 +49,8 @@ public class CoreActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int i) {
 
-              tabLayout.getTabAt(i).select();
+                Objects.requireNonNull(tabLayout.getTabAt(i)).select();
+
             }
 
             @Override
@@ -52,7 +62,6 @@ public class CoreActivity extends AppCompatActivity {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
-
             }
 
             @Override
@@ -70,7 +79,7 @@ public class CoreActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.img0_vector);
 
         Intent intent = getIntent();
-        try{
+        try {
             switch (Objects.requireNonNull(intent.getStringExtra("to"))) {
                 case "notification":
                     setNotification();
@@ -81,11 +90,10 @@ public class CoreActivity extends AppCompatActivity {
                 default:
                     setHome();
             }
-        }catch(NullPointerException e){
+        } catch (NullPointerException e) {
             setHome();
         }
     }
-
 
 
     @Override
@@ -102,14 +110,15 @@ public class CoreActivity extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
-    public void setHome(){
-       viewPager.setCurrentItem(0);
+    private void setHome() {
+        viewPager.setCurrentItem(0);
     }
-    public void setNotification(){
-      viewPager.setCurrentItem(1);
+
+    private void setNotification() {
+        viewPager.setCurrentItem(1);
 
     }
-    public void setProfile(){
+    private void setProfile() {
         viewPager.setCurrentItem(2);
 
     }

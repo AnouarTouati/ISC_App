@@ -1,8 +1,10 @@
 package com.example.isc.Core;
 
 public class MyNotification {
+
     private MyUser myUser;
     private String notificationTime, notificationText;
+
     public MyNotification(MyUser myUser, String notificationText, String notificationTime){
         this.myUser = myUser;
         this.notificationText = notificationText;

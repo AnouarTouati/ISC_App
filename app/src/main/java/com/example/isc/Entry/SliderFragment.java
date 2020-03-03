@@ -2,11 +2,6 @@ package com.example.isc.Entry;
 
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.viewpager.widget.ViewPager;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,16 +9,20 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.ViewPager;
+
 import com.example.isc.LoginSignUp.LoginActivity;
 import com.example.isc.R;
 public class SliderFragment extends Fragment {
 
-    ViewPager viewPager;
-    SliderAdapter imageAdapter;
-    LinearLayout sliderDotsPanel;
-    int dotsCount;
-    ImageView[] dots;
-    Button nextSignUpButton;
+    private  ViewPager viewPager;
+    private  SliderAdapter imageAdapter;
+    private  LinearLayout sliderDotsPanel;
+    private  int dotsCount;
+    private  ImageView[] dots;
+    private  Button nextSignUpButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

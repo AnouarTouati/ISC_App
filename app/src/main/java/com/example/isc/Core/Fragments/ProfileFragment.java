@@ -2,6 +2,8 @@ package com.example.isc.Core.Fragments;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -18,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.example.isc.Common;
@@ -35,7 +38,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -48,55 +53,32 @@ public class ProfileFragment extends Fragment {
     private Bitmap profileImageAsBitmap;
     private LinearLayout nameLayout, positionLayout, studentNumberLayout, emailLayout, postLayout;
     private TextView nameTextView, positionTextView, studentNumberTextView, emailTextView;
-    private EditText nameEditText, positionEditText, studentNumberEditText, emailEditText;
-    private ImageView editNameIV, editPositionIV, editStudentNumberIV, editEmailIV, showProfilePostIV;
+    private EditText nameEditText, positionEditText;
+    private ImageView editNameIV, editPositionIV, showProfilePostIV;
     private static final int PICK_IMAGE = 1;
 
-    MyUser myUser0;
+    private MyUser myUser0;
 
     private Boolean n = false, p = false, s = false, e = false, postIsVisible = false;
 
-    FloatingActionButton profilePostsUpButton;
-    ScrollView profileScrollView;
-
-    NonScrollListView profilePostsListView;
-    ProfilePostsListAdapter adapter;
+    private FloatingActionButton profilePostsUpButton;
+    private  ScrollView profileScrollView;
+    private  ProgressDialog progressDialog;
+    private  NonScrollListView profilePostsListView;
+    private  ProfilePostsListAdapter adapter;
     public static ArrayList<MyPost> postArrayList = new ArrayList<>();
 
-    FirebaseUser firebaseUser;
-    FirebaseFirestore firebaseFirestore;
-    FirebaseStorage firebaseStorage;
+    private  FirebaseUser firebaseUser;
+    private  FirebaseFirestore firebaseFirestore;
+    private  FirebaseStorage firebaseStorage;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View fragmentView = inflater.inflate(R.layout.fragment_profile, container, false);
 
+        progressDialog=new ProgressDialog(getContext());
         initialize(fragmentView);
         firebaseStorage=FirebaseStorage.getInstance();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        firebaseFirestore = FirebaseFirestore.getInstance();
-
-        firebaseFirestore.collection("Profiles").document(firebaseUser.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-
-                    //i will deal with the image later
-                    myUser0 = new MyUser(firebaseUser.getUid(),null, (String) task.getResult().get("name"), Common.position[task.getResult().getLong("position").intValue()]);
-                    Log.v("ConnectivityFireBase", "Received profile successfully");
-
-                    nameTextView.setText(myUser0.getFullName());
-                    positionTextView.setText(myUser0.getPosition());
-                    studentNumberTextView.setText("Not Implemented yet");
-                    emailTextView.setText(firebaseUser.getEmail());
-                    //we check for valid reference inside getImageFromServer method
-                    getImageFromServer(task.getResult().get("profileImageReferenceInStorage").toString(),-1);//-1 indicates profile image
-
-                } else {
-                    Log.v("ConnectivityFireBase", "Error receiving profile " + task.getException());
-                }
-            }
-        });
-
 
         profilePostsListView = fragmentView.findViewById(R.id.profilePostsListView);
 
@@ -126,11 +108,11 @@ public class ProfileFragment extends Fragment {
                 profileScrollView.fullScroll(ScrollView.FOCUS_UP);
             }
         });
-
+         getUserProfile();
         return fragmentView;
     }
 
-    void initialize(View fragmentView) {
+    private void initialize(View fragmentView) {
 
         profileImage = fragmentView.findViewById(R.id.profileImage);
         nameLayout = fragmentView.findViewById(R.id.profileNameLayout);
@@ -146,13 +128,11 @@ public class ProfileFragment extends Fragment {
 
         nameEditText = fragmentView.findViewById(R.id.nameEditText);
         positionEditText = fragmentView.findViewById(R.id.positionEditText);
-        studentNumberEditText = fragmentView.findViewById(R.id.studentNumberEditText);
-        emailEditText = fragmentView.findViewById(R.id.emailEditText);
+
 
         editNameIV = fragmentView.findViewById(R.id.editName);
         editPositionIV = fragmentView.findViewById(R.id.editPosition);
-        editStudentNumberIV = fragmentView.findViewById(R.id.editStudentNumber);
-        editEmailIV = fragmentView.findViewById(R.id.editEmail);
+
         showProfilePostIV = fragmentView.findViewById(R.id.showProfilePostIV);
 
         profileImage.setOnClickListener(new View.OnClickListener() {
@@ -175,6 +155,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (n) {
+                    updateProfileName(nameEditText.getText().toString());
                     nameTextView.setVisibility(View.VISIBLE);
                     nameEditText.setVisibility(View.GONE);
                     editNameIV.setImageResource(R.drawable.ic_edit_black_24dp);
@@ -217,80 +198,59 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        studentNumberLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                studentNumberTextView.setVisibility(View.GONE);
-                studentNumberEditText.setVisibility(View.VISIBLE);
-                studentNumberEditText.setText(studentNumberTextView.getText());
-                editStudentNumberIV.setImageResource(R.drawable.ic_add_gray_24dp);
-                s = true;
-            }
-        });
-        editStudentNumberIV.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (s) {
-                    studentNumberTextView.setVisibility(View.VISIBLE);
-                    studentNumberEditText.setVisibility(View.GONE);
-                    editStudentNumberIV.setImageResource(R.drawable.ic_edit_black_24dp);
-                    s = false;
-                } else {
-                    studentNumberTextView.setVisibility(View.GONE);
-                    studentNumberEditText.setVisibility(View.VISIBLE);
-                    studentNumberEditText.setText(studentNumberTextView.getText());
-                    editStudentNumberIV.setImageResource(R.drawable.ic_add_gray_24dp);
-                    s = true;
-                }
-            }
-        });
-
-        emailLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                emailTextView.setVisibility(View.GONE);
-                emailEditText.setVisibility(View.VISIBLE);
-                emailEditText.setText(emailTextView.getText());
-                editEmailIV.setImageResource(R.drawable.ic_add_gray_24dp);
-                e = true;
-            }
-        });
-        editEmailIV.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (e) {
-                    emailTextView.setVisibility(View.VISIBLE);
-                    emailEditText.setVisibility(View.GONE);
-                    editEmailIV.setImageResource(R.drawable.ic_edit_black_24dp);
-                    e = false;
-                } else {
-                    emailTextView.setVisibility(View.GONE);
-                    emailEditText.setVisibility(View.VISIBLE);
-                    emailEditText.setText(emailTextView.getText());
-                    editEmailIV.setImageResource(R.drawable.ic_add_gray_24dp);
-                    e = true;
-                }
-            }
-        });
         profilePostsUpButton = fragmentView.findViewById(R.id.profileUpButton);
     }
 
+    private void getUserProfile(){
+     firebaseFirestore = FirebaseFirestore.getInstance();
 
-    void getUserPosts() {
+     firebaseFirestore.collection("Profiles").document(firebaseUser.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+         @Override
+         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+             if (task.isSuccessful()) {
+
+                 //i will deal with the image later
+                 myUser0 = new MyUser(firebaseUser.getUid(),null, (String) Objects.requireNonNull(task.getResult()).get("name"), Common.position[Objects.requireNonNull(task.getResult().getLong("position")).intValue()]);
+                 Log.v("ConnectivityFireBase", "Received profile successfully");
+
+                 nameTextView.setText(myUser0.getFullName());
+                 positionTextView.setText(myUser0.getPosition());
+                 studentNumberTextView.setText("Not Implemented yet");
+                 emailTextView.setText(firebaseUser.getEmail());
+                 //we check for valid reference inside getImageFromServer method
+                 getImageFromServer(task.getResult().get("profileImageReferenceInStorage").toString(),-1);//-1 indicates profile image
+
+             } else {
+                 Log.v("ConnectivityFireBase", "Error receiving profile " + task.getException());
+             }
+         }
+     });
+
+
+ }
+    private void getUserPosts() {
         firebaseFirestore.collection("AllPosts").document(firebaseUser.getUid()).collection("userPosts").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     postArrayList.clear();
-                    List<DocumentSnapshot> snapshots=task.getResult().getDocuments();
+                    List<DocumentSnapshot> snapshots= Objects.requireNonNull(task.getResult()).getDocuments();
                     for (int i=0;i<snapshots.size();i++) {
-                        String cpText = snapshots.get(i).get("cpText").toString();
-                        String checkedDepartments = snapshots.get(i).get("checkedDepartments").toString();
-                        String colleagues = snapshots.get(i).get("colleagues").toString();
-                        String events = snapshots.get(i).get("events").toString();
-                        postArrayList.add(new MyPost(myUser0, i/*this i here is useless we just use it for home*/,cpText, null, checkedDepartments, colleagues, events));
-                        String imageReferenceInStorage=snapshots.get(i).get("imageReferenceInStorage").toString();
-                        getImageFromServer(imageReferenceInStorage,postArrayList.size()-1/*aka index where the image should be placed*/);
+                        String cpText = Objects.requireNonNull(snapshots.get(i).get("cpText")).toString();
+                        String checkedDepartments = Objects.requireNonNull(snapshots.get(i).get("checkedDepartments")).toString();
+                        String colleagues = Objects.requireNonNull(snapshots.get(i).get("colleagues")).toString();
+                        String events = Objects.requireNonNull(snapshots.get(i).get("events")).toString();
+                        String postID= Objects.requireNonNull(snapshots.get(i).get("postID")).toString();
+                        if(!snapshots.get(i).get("imageReferenceInStorage").toString().equals("")){
+                            Bitmap placeHolderImage = BitmapFactory.decodeResource(getResources(), R.drawable.post_image_placeholder);
+                            postArrayList.add(new MyPost(postID,myUser0, i/*this i here is useless we just use it for home*/,cpText, placeHolderImage, checkedDepartments, colleagues, events));
+                            String imageReferenceInStorage=snapshots.get(i).get("imageReferenceInStorage").toString();
+                            getImageFromServer(imageReferenceInStorage,postArrayList.size()-1/*aka index where the image should be placed*/);
+                        }else{
+                            postArrayList.add(new MyPost(postID,myUser0, i/*this i here is useless we just use it for home*/,cpText, null, checkedDepartments, colleagues, events));
+                        }
+
+
                     }
                     dataUpdatedNotifyListView();
                 } else {
@@ -301,13 +261,13 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-    void dataUpdatedNotifyListView() {
+    private  void dataUpdatedNotifyListView() {
         adapter = new ProfilePostsListAdapter(getContext(), R.layout.activity_profile_post_list_adapter, postArrayList);
         profilePostsListView.setAdapter(adapter);
         profilePostsListView.setScrollContainer(false);
     }
 
-   void getImageFromServer(String storageReferencePath, final int postArrayListIndex){
+    private void getImageFromServer(String storageReferencePath, final int postArrayListIndex){
 
        if(storageReferencePath!=null) {
            if (!storageReferencePath.equals("")) {
@@ -325,8 +285,8 @@ public class ProfileFragment extends Fragment {
                                postArrayList.remove(postArrayListIndex);
                                postArrayList.add(postArrayListIndex, aPost);
                                dataUpdatedNotifyListView();
-                           } else if (postArrayListIndex == -1/*aka the profile image*/) {
-                               profileImageAsBitmap = BitmapFactory.decodeByteArray(task.getResult().clone(), 0, task.getResult().length);
+                           } else {
+                               profileImageAsBitmap = BitmapFactory.decodeByteArray(Objects.requireNonNull(task.getResult()).clone(), 0, task.getResult().length);
                                profileImage.setImageBitmap(profileImageAsBitmap);
                                //the below statements must stay in order and here since we want to use myUser0 to instantiate the post
                                myUser0.setProfileImageBitmap(profileImageAsBitmap);
@@ -334,21 +294,21 @@ public class ProfileFragment extends Fragment {
                            }
 
                        } else {
-                           Log.d("ConnectivityFireBase", "Something went wrong and we couldn't get images " + task.getException().toString());
+                           Log.d("ConnectivityFireBase", "Something went wrong and we couldn't get images " + Objects.requireNonNull(task.getException()).toString());
                        }
                    }
                });
            } else{addPostToArrayListWithoutImage(postArrayListIndex);}
        }else {addPostToArrayListWithoutImage(postArrayListIndex);}
    }
-void addPostToArrayListWithoutImage(int postArrayListIndex){
+    private  void addPostToArrayListWithoutImage(int postArrayListIndex){
     MyPost aPost = postArrayList.get(postArrayListIndex);
     aPost.setPostedImage(null);
     postArrayList.remove(postArrayListIndex);
     postArrayList.add(postArrayListIndex, aPost);
     dataUpdatedNotifyListView();
 }
-    public void selectImage() {
+    private void selectImage() {
         Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
         getIntent.setType("image/*");
 
@@ -376,7 +336,8 @@ void addPostToArrayListWithoutImage(int postArrayListIndex){
                 Toast.makeText(getContext(), "File not found exception", Toast.LENGTH_SHORT).show();
             }
             if (inputStream != null) {
-                profileImage.setImageBitmap(BitmapFactory.decodeStream(inputStream));
+                updateProfileImage(BitmapFactory.decodeStream(inputStream));
+            //    profileImage.setImageBitmap(BitmapFactory.decodeStream(inputStream));
             } else {
                 Toast.makeText(getContext(), "inputStream is null", Toast.LENGTH_SHORT).show();
             }
@@ -411,4 +372,54 @@ void addPostToArrayListWithoutImage(int postArrayListIndex){
         }
     }
 
+    private void updateProfileName(String newName){
+        firebaseFirestore.collection("Profiles").document(firebaseUser.getUid()).update("name",newName).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                getUserProfile();
+            }
+        });
+
+    }
+    private void updateProfileImage(final Bitmap imageToPush){
+            progressDialog.setMessage("Uploading...");
+            progressDialog.show();
+
+            StorageReference imageReference = firebaseStorage.getReference();
+            imageReference = imageReference.child("images/"+firebaseUser.getUid()+"/"+"ProfileImage"+".JPEG");
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            imageToPush.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+            byte[] imageInBytes = byteArrayOutputStream.toByteArray();
+            UploadTask uploadImageTask = imageReference.putBytes(imageInBytes);
+            uploadImageTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        progressDialog.dismiss();
+                        Toast.makeText(getContext(), "Done", Toast.LENGTH_LONG).show();
+                        Log.v("ConnectivityFireBase", "Done Updating Profile image");
+                        getUserProfile();
+                    } else {
+
+                        progressDialog.dismiss();
+                        Toast.makeText(getContext(), "Something went wrong we couldn't update your profile image", Toast.LENGTH_LONG).show();
+                        Log.v("ConnectivityFireBase", "Something went wrong we couldn't Update Profile image" + "onComplete callback Update Profile Image" + task.getException().getMessage());
+                        somethingWentWrongPleaseTryAgainImageProblem(imageToPush);
+
+                    }
+                }
+            });
+
+        }
+    private void somethingWentWrongPleaseTryAgainImageProblem(final Bitmap imageToPush){
+
+        AlertDialog.Builder alertDialogBuilder=  new AlertDialog.Builder(Objects.requireNonNull(getContext())).setTitle("Failed To Complete Sign UP")
+                .setMessage("Something went wrong and we couldn't sign you up, let's give it another go shall we")
+                .setPositiveButton("Retry", new DialogInterface.OnClickListener(){
+                    public void onClick( DialogInterface dialog,int id){
+                        updateProfileImage(imageToPush);
+                    }
+                }).setNegativeButton("Cancel", null);
+        alertDialogBuilder.create().show();
+    }
 }

@@ -3,16 +3,17 @@ package com.example.isc.Core;
 import android.graphics.Bitmap;
 
 public class MyPost {
+
     private String postedText, myPostLevel, myPostTagColleague, myPostEvents;
-  //  private int postedImage;
     private Bitmap postedImageBitmap;
     private MyUser myUser;
-
+    private String postID;
    private int indexOfPostForThisUser;//cause we might have multiple post by a single user
 
-    public MyPost(MyUser myUser,int indexOfPostForThisUser, String postedText, Bitmap postedImageBitmap,
+    public MyPost(String postID,MyUser myUser,int indexOfPostForThisUser, String postedText, Bitmap postedImageBitmap,
                   String myPostLevel, String myPostTagColleague, String myPostEvents){
-        this.postedText = postedText;
+       this.postID=postID;
+       this.postedText = postedText;
         this.postedImageBitmap = postedImageBitmap;
         this.myUser = myUser;
         this.myPostLevel = myPostLevel;
@@ -56,6 +57,7 @@ public class MyPost {
     public MyUser getMyUser() {
         return myUser;
     }
+    public String getPostID(){return postID;}
 
     public void setMyUser(MyUser myUser) {
         this.myUser = myUser;

@@ -17,8 +17,8 @@ import java.util.Objects;
 
 public class EntryActivity extends AppCompatActivity {
 
-    LogoFragment logoFragment;
-    SliderFragment sliderFragment;
+    private  LogoFragment logoFragment;
+    private SliderFragment sliderFragment;
 
     int displayedFragment;
 
@@ -33,10 +33,10 @@ public class EntryActivity extends AppCompatActivity {
         sliderFragment = new SliderFragment();
 
         Intent intent = getIntent();
-        if (Objects.equals(intent.getStringExtra("interior"), "true")){
+        if (Objects.equals(intent.getStringExtra("interior"), "true")) {
             openFragment(sliderFragment);
             displayedFragment = 1;
-        }else{
+        } else {
             openFragment(logoFragment);
             final Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
@@ -47,12 +47,13 @@ public class EntryActivity extends AppCompatActivity {
                 }
             }, 3000);
         }
-        if(FirebaseAuth.getInstance().getCurrentUser()!=null){
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             finish();
             startActivity(new Intent(getApplicationContext(), CoreActivity.class));
         }
     }
-    public void openFragment(Fragment fragment){
+
+    private void openFragment(Fragment fragment) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.entryFrameLayout, fragment);
         fragmentTransaction.addToBackStack(null);

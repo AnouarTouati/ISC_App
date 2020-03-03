@@ -19,10 +19,10 @@ public class PostLevelAdapter extends ArrayAdapter<String> {
 
     private int resourceLayout;
     private Context mContext;
-    ImageView departmentCheck;
-    TextView departmentName;
-    String myDepartment;
-    LinearLayout departmentLL;
+    private  ImageView departmentCheck;
+    private TextView departmentName;
+    private String myDepartment;
+    private  LinearLayout departmentLL;
 
     public PostLevelAdapter(Context context, int resource, List<String> items) {
         super(context, resource, items);

@@ -30,8 +30,8 @@ import java.util.regex.Pattern;
 
 public class LoginActivity extends AppCompatActivity {
 
-    EditText loginEmail, loginPassword;
-    Button loginButtton;
+    private EditText loginEmail, loginPassword;
+    private Button loginButton;
     private ProgressDialog progressDialog;
     private FirebaseAuth firebaseAuth;
 
@@ -44,7 +44,7 @@ public class LoginActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).hide();
 
         firebaseAuth = FirebaseAuth.getInstance();
-        //means user is already logged in
+
         if(firebaseAuth.getCurrentUser() != null){
             finish();
             startActivity(new Intent(getApplicationContext(), CoreActivity.class));
@@ -53,12 +53,12 @@ public class LoginActivity extends AppCompatActivity {
         progressDialog = new ProgressDialog(this);
         loginEmail = findViewById(R.id.loginEmail);
         loginPassword = findViewById(R.id.loginPassword);
-        loginButtton = findViewById(R.id.loginButton);
+        loginButton = findViewById(R.id.loginButton);
         loginPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
-                    loginUser(loginButtton);
+                    loginUser(loginButton);
                 }
                 return false;
             }
@@ -81,9 +81,7 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        //if the email and password are not empty
-        //displaying a progress dialog
-       progressDialog.setMessage("logging in...");
+       progressDialog.setMessage("Logging in...");
        progressDialog.show();
 
        firebaseAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -111,8 +109,8 @@ public class LoginActivity extends AppCompatActivity {
                        }
                    }
                    catch (Exception e) {
-                       Log.v("ConnectivityFireBase",e.getMessage() +" the  cause is "+e.getCause() );
 
+                       Log.v("ConnectivityFireBase",e.getMessage() +" the  cause is "+e.getCause() );
                        Toast.makeText(getApplicationContext(),"Something went wrong and we couldn't sign you in",Toast.LENGTH_LONG).show();
                    }
 
@@ -136,7 +134,7 @@ public class LoginActivity extends AppCompatActivity {
     public void toTermsAndConditions(View view){
 
     }
-    public static boolean isEmailValid(String email) {
+    private static boolean isEmailValid(String email) {
 
         String expression = "^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$";
         Pattern pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE);

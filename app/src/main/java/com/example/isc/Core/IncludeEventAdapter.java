@@ -17,12 +17,12 @@ import java.util.List;
 
 public class IncludeEventAdapter extends ArrayAdapter<String> {
 
-    private int resourceLayout;
-    private Context mContext;
-    ImageView eventCheck;
-    TextView eventName;
-    String myEvent;
-    LinearLayout eventLL;
+    private  int resourceLayout;
+    private  Context mContext;
+    private  ImageView eventCheck;
+    private  TextView eventName;
+    private  String myEvent;
+    private  LinearLayout eventLL;
 
     public IncludeEventAdapter(Context context, int resource, List<String> items) {
         super(context, resource, items);

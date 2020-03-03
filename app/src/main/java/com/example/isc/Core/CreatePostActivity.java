@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -53,28 +52,26 @@ import java.util.UUID;
 
 public class CreatePostActivity extends AppCompatActivity {
 
-    EditText cpEditText;
-    ImageView cpImage;
-    Bitmap cpImageAsBitmap = null;
-    Button postButton;
-    ImageButton showPostLevelImageButton;
-    LinearLayout createPostLL, optionsLL, photoLL, includeEventLL, tagColleagueLL, specifyDepartmentLL;
-    ScrollView scrollView;
-    TextView photoLLTextView, eventsTextView;
-    public static final int PICK_IMAGE = 1;
+    private  EditText cpEditText;
+    private  ImageView cpImage;
+    private  Bitmap cpImageAsBitmap = null;
+    private  Button postButton;
+    private  ImageButton showPostLevelImageButton;
+    private  LinearLayout createPostLL, optionsLL, photoLL, includeEventLL, tagColleagueLL, specifyDepartmentLL;
+    private  ScrollView scrollView;
+    private  TextView photoLLTextView, eventsTextView;
+    private static final int PICK_IMAGE = 1;
 
-    public  String checkedDepartments = "", events = "", colleagues = "",textToPost="";
-
-  //  public static final String MY_PREFS_NAME = "MyPrefsFile";
-
-    ProgressDialog progressDialog;
+    public String checkedDepartments = "", events = "", colleagues = "",textToPost="";
+    private ProgressDialog progressDialog;
 
 
-    FirebaseFirestore firebaseFirestore;
-    FirebaseUser firebaseUser;
+    private  FirebaseFirestore firebaseFirestore;
+    private FirebaseUser firebaseUser;
 
-    CreatePostViewPagerAdapter viewPagerAdapter;
-    ViewPager viewPager;
+    private   CreatePostViewPagerAdapter viewPagerAdapter;
+    private   ViewPager viewPager;
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -105,21 +102,13 @@ public class CreatePostActivity extends AppCompatActivity {
         eventsTextView = findViewById(R.id.eventsTextView);
         eventsTextView.setText(events);
 
-
         postButton = findViewById(R.id.postButton);
         postButton.setTextColor(Color.GRAY);
 
-       // SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
         cpImage = findViewById(R.id.cpImage);
-    /*    try{
-            Bitmap bitmapImage = stringToBitmap(Objects.requireNonNull(prefs.getString("cpImage", null)));
-            cpImageAsBitmap=bitmapImage;
-            cpImage.setImageBitmap(bitmapImage);
-        }catch (NullPointerException e){}*/
-
-
 
         showPostLevelImageButton = findViewById(R.id.showPostLevelImageButton);
+
         cpEditText = findViewById(R.id.cpEditText);
         cpEditText.setText(textToPost);
         cpEditText.addTextChangedListener(new TextWatcher() {
@@ -212,13 +201,13 @@ public class CreatePostActivity extends AppCompatActivity {
                                     Log.v("ConnectivityFireBase", "Posted Successfully");
 
                                 } else {
-                                    PushPostImageToServer(map.get("imageReferenceInStorage").toString(), cpImageAsBitmap, map.get("postID").toString());
+                                    PushPostImageToServer(Objects.requireNonNull(map.get("imageReferenceInStorage")).toString(), cpImageAsBitmap, Objects.requireNonNull(map.get("postID")).toString());
                                 }
-                                createNotificationDataOnServer(checkedDepartments,map.get("postID").toString());
+                                createNotificationDataOnServer(checkedDepartments, Objects.requireNonNull(map.get("postID")).toString());
                             } else {
                                 progressDialog.dismiss();
                                 Toast.makeText(getApplicationContext(), "Something went wrong we couldn't post", Toast.LENGTH_LONG).show();
-                                Log.v("ConnectivityFireBase", "Something went wrong we couldn't post" + "Post Data" + task.getException().getMessage());
+                                Log.v("ConnectivityFireBase", "Something went wrong we couldn't post" + "Post Data" + Objects.requireNonNull(task.getException()).getMessage());
                             }
                         }
 
@@ -233,7 +222,7 @@ public class CreatePostActivity extends AppCompatActivity {
         }
     }
 
-    void createNotificationDataOnServer(final String checkedDepartments, final String postID){
+    private  void createNotificationDataOnServer(final String checkedDepartments, final String postID){
         firebaseFirestore.collection("AllPosts").document(/*aka users*/firebaseUser.getUid()).collection("userPosts").document(postID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -242,13 +231,13 @@ public class CreatePostActivity extends AppCompatActivity {
                 map.put("notificationText","has posted in the department of "+checkedDepartments);
 
 
-                    if(Objects.requireNonNull(task.getResult()).contains("date")){
-                        map.put("notificationTime", Objects.requireNonNull(task.getResult().getTimestamp("date")).toDate().toString());
+                if(Objects.requireNonNull(task.getResult()).contains("date")){
+                    map.put("notificationTime", Objects.requireNonNull(task.getResult().getTimestamp("date")).toDate().toString());
 
-                    }
-                    else{
-                        map.put("notificationTime","");
-                    }
+                }
+                else{
+                    map.put("notificationTime","");
+                }
 
                 firebaseFirestore.collection("Notifications").document(postID).set(map).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -263,7 +252,7 @@ public class CreatePostActivity extends AppCompatActivity {
         });
 
     }
-    void PushPostImageToServer(String imageReferenceInStorage, Bitmap imageToPush, final String postID) {
+    private void PushPostImageToServer(String imageReferenceInStorage, Bitmap imageToPush, final String postID) {
         FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
         StorageReference imageReference = firebaseStorage.getReference();
         imageReference = imageReference.child(imageReferenceInStorage);
@@ -283,7 +272,7 @@ public class CreatePostActivity extends AppCompatActivity {
                     deletePostPushImageWasNotSuccessful(postID);
                     progressDialog.dismiss();
                     Toast.makeText(getApplicationContext(), "Something went wrong we couldn't post", Toast.LENGTH_LONG).show();
-                    Log.v("ConnectivityFireBase", "Something went wrong we couldn't post" + "onComplete callback Push Image" + task.getException().getMessage());
+                    Log.v("ConnectivityFireBase", "Something went wrong we couldn't post" + "onComplete callback Push Image" + Objects.requireNonNull(task.getException()).getMessage());
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -303,10 +292,10 @@ public class CreatePostActivity extends AppCompatActivity {
 
     }
 
-    void deletePostPushImageWasNotSuccessful(String postID) {
+    private void deletePostPushImageWasNotSuccessful(String postID) {
         FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        firebaseFirestore.collection("AllPosts").document(firebaseUser.getUid()).collection("userPosts").document(postID).delete();
+        firebaseFirestore.collection("AllPosts").document(Objects.requireNonNull(firebaseUser).getUid()).collection("userPosts").document(postID).delete();
     }
 
     @Override
@@ -326,7 +315,7 @@ public class CreatePostActivity extends AppCompatActivity {
                 .show();
     }
 
-    void goBackToCoreActivity() {
+    private  void goBackToCoreActivity() {
         Intent intent = new Intent(getApplicationContext(), CoreActivity.class);
         intent.putExtra("to", "home");
         startActivity(intent);
@@ -349,7 +338,7 @@ public class CreatePostActivity extends AppCompatActivity {
         return true;
     }
 
-    public void selectImage() {
+    private void selectImage() {
         if (photoLLTextView.getText().equals("Photo")) {
             Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
             getIntent.setType("image/*");
@@ -407,7 +396,7 @@ public class CreatePostActivity extends AppCompatActivity {
         Log.d("AppLogic", "onActivityResult: ");
     }
 
-    public void includeEvent() {
+    private void includeEvent() {
        viewPager.setCurrentItem(0);
         optionsLL.setVisibility(View.GONE);
         scrollView.setVisibility(View.GONE);
@@ -415,7 +404,7 @@ public class CreatePostActivity extends AppCompatActivity {
 
     }
 
-    public void tagColleague() {
+    private void tagColleague() {
       viewPager.setCurrentItem(1);
         optionsLL.setVisibility(View.GONE);
         scrollView.setVisibility(View.GONE);
@@ -423,7 +412,7 @@ public class CreatePostActivity extends AppCompatActivity {
 
     }
 
-    public void specifyDepartment() {
+    private void specifyDepartment() {
        viewPager.setCurrentItem(2);
         optionsLL.setVisibility(View.GONE);
         scrollView.setVisibility(View.GONE);
@@ -455,18 +444,6 @@ public class CreatePostActivity extends AppCompatActivity {
                 .setPositiveButton("OK", null)
                 .setNegativeButton(null, null)
                 .show();
-    }
-
-    public String bitmapToString(Bitmap bitmap){
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
-        byte[] b = baos.toByteArray();
-        return Base64.encodeToString(b, Base64.DEFAULT);
-    }
-
-    public Bitmap stringToBitmap(String s){
-        byte[] imageAsBytes = Base64.decode(s.getBytes(), Base64.DEFAULT);
-        return BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
     }
 
 

@@ -10,7 +10,7 @@ public class MyUser {
 
     public MyUser(String userID,Bitmap profileImageBitmap, String fullName, String position){
         this.userID=userID;
-        this.profileImageBitmap = this.profileImageBitmap;
+        this.profileImageBitmap =profileImageBitmap;
         this.fullName = fullName;
         this.position = position;
     }

@@ -43,26 +43,27 @@ import java.util.Objects;
 
 public class FinishSignUpActivity extends AppCompatActivity {
 
-    ImageView signUpProfileImage, addSignUpProfileImageIV;
-    Bitmap signUpProfileImageBitmap=null;
-    EditText signUpFullName;
-    Spinner departmentSpinner;
-    RadioGroup positionRadio;
+      private  ImageView signUpProfileImage, addSignUpProfileImageIV;
+      private  Bitmap signUpProfileImageBitmap=null;
+      private  EditText signUpFullName;
+      private  Spinner departmentSpinner;
+      private  RadioGroup positionRadio;
 
-    ArrayList<String> departments;
-    public static final int PICK_IMAGE = 1;
+      private   ArrayList<String> departments;
+      private static final int PICK_IMAGE = 1;
 
-    FirebaseAuth firebaseAuth;
-    FirebaseUser firebaseUser;
-    FirebaseStorage firebaseStorage;
-    FirebaseFirestore firebaseFirestore;
-    ProgressDialog progressDialog;
+      private FirebaseAuth firebaseAuth;
+      private FirebaseUser firebaseUser;
+      private FirebaseStorage firebaseStorage;
+      private   FirebaseFirestore firebaseFirestore;
+
+      private ProgressDialog progressDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_finish_sign_up);
 
-     signUpProfileImage = findViewById(R.id.signUpProfileImage);
+       signUpProfileImage = findViewById(R.id.signUpProfileImage);
        addSignUpProfileImageIV = findViewById(R.id.addSignUpProfileImageIV);
 
         progressDialog=new ProgressDialog(this);
@@ -135,10 +136,10 @@ public class FinishSignUpActivity extends AppCompatActivity {
 
 
     }
-    void pushPostImageToServer(final String imageReferenceInStorage, final Bitmap imageToPush) {
+  private void pushPostImageToServer(final String imageReferenceInStorage, final Bitmap imageToPush) {
         progressDialog.show();
         StorageReference imageReference = firebaseStorage.getReference();
-      imageReference = imageReference.child(imageReferenceInStorage);
+        imageReference = imageReference.child(imageReferenceInStorage);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         imageToPush.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
         byte[] imageInBytes = byteArrayOutputStream.toByteArray();
@@ -153,17 +154,17 @@ public class FinishSignUpActivity extends AppCompatActivity {
                     startActivity(new Intent(getApplicationContext(), CoreActivity.class));
                 } else {
 
-                        progressDialog.dismiss();
-                        Toast.makeText(getApplicationContext(), "Something went wrong we couldn't sign you up", Toast.LENGTH_LONG).show();
-                        Log.v("ConnectivityFireBase", "Something went wrong we couldn't Uploading Profile image" + "onComplete callback Push Image" + task.getException().getMessage());
-                      somethingWentWrongPleaseTryAgainImageProblem(imageReferenceInStorage,imageToPush);
+                    progressDialog.dismiss();
+                    Toast.makeText(getApplicationContext(), "Something went wrong we couldn't sign you up", Toast.LENGTH_LONG).show();
+                    Log.v("ConnectivityFireBase", "Something went wrong we couldn't Uploading Profile image" + "onComplete callback Push Image" + task.getException().getMessage());
+                    somethingWentWrongPleaseTryAgainImageProblem(imageReferenceInStorage,imageToPush);
 
                 }
             }
         });
 
     }
-   void somethingWentWrongPleaseTryAgainImageProblem(final String imageReferenceInStorage, final Bitmap imageToPush){
+    private void somethingWentWrongPleaseTryAgainImageProblem(final String imageReferenceInStorage, final Bitmap imageToPush){
 
      AlertDialog.Builder alertDialogBuilder=  new AlertDialog.Builder(this).setTitle("Failed To Complete Sign UP")
                .setMessage("Something went wrong and we couldn't sign you up, let's give it another go shall we")
@@ -179,14 +180,14 @@ public class FinishSignUpActivity extends AppCompatActivity {
        });
       alertDialogBuilder.create().show();
    }
-   void deleteProfileAndGoBackToSignUpActivity(){
+    private void deleteProfileAndGoBackToSignUpActivity(){
        firebaseFirestore.collection("Profiles").document(firebaseUser.getUid()).delete();
        firebaseUser.delete();
        firebaseAuth.signOut();
        startActivity(new Intent(getApplicationContext(),SignUpActivity.class));
        finish();
    }
-    void addFullProfileToDataBase(String name,int position,String department){
+    private   void addFullProfileToDataBase(String name,int position,String department){
         firebaseFirestore=FirebaseFirestore.getInstance();
         final Map<String,Object> map =new HashMap<>();
         map.put("name",name);
@@ -233,7 +234,7 @@ public class FinishSignUpActivity extends AppCompatActivity {
 
     }
 
-    public static boolean isValidName(String str) {
+    private static boolean isValidName(String str) {
         if(str.length()<3){
             return false;
         }
@@ -241,7 +242,7 @@ public class FinishSignUpActivity extends AppCompatActivity {
         return str.matches(expression);
     }
 
-    public void selectImage(){
+    private void selectImage(){
         Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
         getIntent.setType("image/*");
 

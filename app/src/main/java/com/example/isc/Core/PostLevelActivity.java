@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import com.example.isc.R;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class PostLevelActivity extends Fragment {
     ArrayList<String> postLevelList;
@@ -38,7 +39,7 @@ public class PostLevelActivity extends Fragment {
             add("Exterior Relations");
         }};
         includedDepartments = new ArrayList<>();
-        adapter = new PostLevelAdapter(getActivity().getApplicationContext(), R.layout.activity_post_level_list_adapter, postLevelList);
+        adapter = new PostLevelAdapter(Objects.requireNonNull(getActivity()).getApplicationContext(), R.layout.activity_post_level_list_adapter, postLevelList);
         postLevelListView = view.findViewById(R.id.postLevelListView);
         postLevelListView.setAdapter(adapter);
 
@@ -51,8 +52,18 @@ public class PostLevelActivity extends Fragment {
                     departments.append(includedDepartments.get(i));
                     departments.append("\n");
                 }
-                ((CreatePostActivity)getActivity()).checkedDepartments=departments.toString();
-                ((CreatePostActivity)getActivity()).returnViewToTheParentActivity();
+                if(getActivity()!=null){
+                    if(getActivity() instanceof CreatePostActivity){
+                        ((CreatePostActivity)getActivity()).checkedDepartments=departments.toString();
+                        ((CreatePostActivity)getActivity()).returnViewToTheParentActivity();
+                    }
+                    else if(getActivity() instanceof EditPostActivity){
+                        ((EditPostActivity)getActivity()).epCheckedDepartments=departments.toString();
+                        ((EditPostActivity)getActivity()).returnViewToTheParentActivity();
+                    }
+                }
+
+
 
             }
         });

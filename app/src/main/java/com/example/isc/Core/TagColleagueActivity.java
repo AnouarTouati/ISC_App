@@ -15,15 +15,16 @@ import androidx.fragment.app.Fragment;
 import com.example.isc.R;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class TagColleagueActivity extends Fragment {
 
-    static ArrayList<String> taggedColleagues;
-    ArrayList<MyUser> colleagues;
-    TagColleagueAdapter tagColleagueAdapter;
-    ListView colleagueListView;
-    Button tagColleagueButton;
-    SearchView searchColleague;
+    static    ArrayList<String> taggedColleagues;
+    private   ArrayList<MyUser> colleagues;
+    private   TagColleagueAdapter tagColleagueAdapter;
+    private   ListView colleagueListView;
+    private   Button tagColleagueButton;
+    private   SearchView searchColleague;
 
 
     View view;
@@ -43,7 +44,7 @@ public class TagColleagueActivity extends Fragment {
             add(new MyUser("Garbage",null, "Nedjem Eddine", "Head"));
             add(new MyUser("Garbage",null, "Saad Eddine", "Member"));
         }};
-        tagColleagueAdapter = new TagColleagueAdapter(getActivity().getApplicationContext(), R.layout.activity_tag_colleague_list_adapter, colleagues);
+        tagColleagueAdapter = new TagColleagueAdapter(Objects.requireNonNull(getActivity()).getApplicationContext(), R.layout.activity_tag_colleague_list_adapter, colleagues);
         colleagueListView = view.findViewById(R.id.colleagueListView);
         colleagueListView.setAdapter(tagColleagueAdapter);
 
@@ -57,8 +58,16 @@ public class TagColleagueActivity extends Fragment {
                     tagColleague.append(taggedColleagues.get(i));
                     tagColleague.append("\n");
                 }
-                ((CreatePostActivity)getActivity()).colleagues=tagColleague.toString();
-                ((CreatePostActivity)getActivity()).returnViewToTheParentActivity();
+                if(getActivity()!=null){
+                    if(getActivity() instanceof  CreatePostActivity){
+                        ((CreatePostActivity)getActivity()).colleagues=tagColleague.toString();
+                        ((CreatePostActivity)getActivity()).returnViewToTheParentActivity();
+                    }
+                    else  if (getActivity() instanceof EditPostActivity){
+                        ((EditPostActivity)getActivity()).epColleagues=tagColleague.toString();
+                        ((EditPostActivity)getActivity()).returnViewToTheParentActivity();
+                    }
+                }
 
             }
         });

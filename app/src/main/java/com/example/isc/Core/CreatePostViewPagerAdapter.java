@@ -9,7 +9,7 @@ import java.util.List;
 
 public class CreatePostViewPagerAdapter extends FragmentPagerAdapter {
 
-    List<Fragment> fragmentsList=new ArrayList<>();
+    private  List<Fragment> fragmentsList=new ArrayList<>();
 
     public CreatePostViewPagerAdapter(FragmentManager fragmentManager){
         super(fragmentManager,BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);

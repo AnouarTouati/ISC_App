@@ -20,15 +20,15 @@ import java.util.Objects;
 
 public class ShowUserProfileActivity extends AppCompatActivity {
 
-    TextView userName, userPosition, userStudentNumber, userEmail;
-    LinearLayout userPostsLayout;
-    ImageView showProfilePostIV;
-    FloatingActionButton userPostsUpButton;
-    ScrollView scrollView;
+    private TextView userName, userPosition, userStudentNumber, userEmail;
+    private  LinearLayout userPostsLayout;
+    private ImageView showProfilePostIV;
+    private FloatingActionButton userPostsUpButton;
+    private  ScrollView scrollView;
 
-    NonScrollListView userPostsListView;
-    ShowUserProfilePostsListAdapter adapter;
-    private ArrayList<MyPost> postArrayList;
+    private   NonScrollListView userPostsListView;
+    private   ShowUserProfilePostsListAdapter adapter;
+    private   ArrayList<MyPost> postArrayList;
 
     Boolean userPostIsVisible = false;
 

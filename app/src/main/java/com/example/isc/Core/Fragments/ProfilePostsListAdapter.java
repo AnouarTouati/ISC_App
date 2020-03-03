@@ -93,7 +93,7 @@ public class ProfilePostsListAdapter extends ArrayAdapter<MyPost> {
                 holder.posterProfileImage.setDrawingCacheEnabled(true);
             }
             if (postedImage != null) {
-               // holder.postedImage.setImageResource(post.getPostedImage());
+
                 if(post.getPostedImageBitmap()!=null){
                     holder.postedImage.setImageBitmap(post.getPostedImageBitmap());
                     holder.postedImage.setDrawingCacheEnabled(true);
@@ -151,7 +151,7 @@ public class ProfilePostsListAdapter extends ArrayAdapter<MyPost> {
                                 switch (item.getItemId()){
                                     case R.id.edit:
                                         Intent intent = new Intent(getContext(), EditPostActivity.class);
-                                        intent.putExtra("position", Integer.toString(position));
+                                        intent.putExtra("position", position);
                                         getContext().startActivity(intent);
                                         break;
                                     case R.id.delete:

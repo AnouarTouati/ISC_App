@@ -18,13 +18,13 @@ import java.util.Locale;
 
 public class TagColleagueAdapter extends ArrayAdapter<MyUser> {
 
-    private int resourceLayout;
-    private Context mContext;
-    ImageView colleagueProfileImage, colleagueCheck;
-    TextView colleagueName, colleaguePosition;
-    MyUser myColleague;
-    List<MyUser> list = null;
-    ArrayList<MyUser> arrayList;
+    private  int resourceLayout;
+    private  Context mContext;
+    private  ImageView colleagueProfileImage, colleagueCheck;
+    private  TextView colleagueName, colleaguePosition;
+    private  MyUser myColleague;
+    private  List<MyUser> list = null;
+    private  ArrayList<MyUser> arrayList;
 
     public TagColleagueAdapter(Context context, int resource, List<MyUser> items) {
         super(context, resource, items);

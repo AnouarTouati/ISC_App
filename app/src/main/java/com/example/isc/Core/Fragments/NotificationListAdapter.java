@@ -20,8 +20,8 @@ public class NotificationListAdapter extends ArrayAdapter<MyNotification> {
     private int resourceLayout;
     private Context mContext;
     private MyNotification myNotification;
-    TextView notificationTextView, notificationTime;
-    ImageView notificationProfileImage;
+    private TextView notificationTextView, notificationTime;
+    private ImageView notificationProfileImage;
 
     public NotificationListAdapter(Context context, int resource, List<MyNotification> items) {
         super(context, resource, items);

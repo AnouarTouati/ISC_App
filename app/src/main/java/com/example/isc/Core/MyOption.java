@@ -3,6 +3,7 @@ package com.example.isc.Core;
 public class MyOption {
     private int optionIcon;
     private String option;
+
     public MyOption(int optionIcon, String option){
         this.option = option;
         this.optionIcon = optionIcon;
