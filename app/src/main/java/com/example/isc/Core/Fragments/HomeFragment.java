@@ -43,7 +43,7 @@ public class HomeFragment extends Fragment {
     private SwipeRefreshLayout pullToRefresh;
     private ArrayList<MyUser> allUsersProfiles = new ArrayList<>();
     private static int index = 0, top = 0;
-
+    private  final String CHANNEL_ID="The ID IS String";//used by notification for android 8 and up
 
     private FirebaseFirestore firebaseFirestore;
     private FirebaseStorage firebaseStorage;

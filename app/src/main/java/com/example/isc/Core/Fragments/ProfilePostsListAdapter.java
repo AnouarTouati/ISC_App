@@ -14,7 +14,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -36,11 +35,13 @@ public class ProfilePostsListAdapter extends ArrayAdapter<MyPost> {
     private ImageView posterProfileImage, postedImage;
     private ImageButton postLevelButton, tagColleagueButton, editProfilePostIB;
     private LinearLayout posterProfileLayout;
+    private ProfileFragment profileFragment;
 
-    public ProfilePostsListAdapter(Context context, int resource, List<MyPost> items) {
+    public ProfilePostsListAdapter(Context context, int resource, List<MyPost> items,ProfileFragment profileFragment) {
         super(context, resource, items);
         this.resourceLayout = resource;
         this.mContext = context;
+        this.profileFragment=profileFragment;
     }
 
     @Override
@@ -155,7 +156,7 @@ public class ProfilePostsListAdapter extends ArrayAdapter<MyPost> {
                                         getContext().startActivity(intent);
                                         break;
                                     case R.id.delete:
-                                        Toast.makeText(getContext(), "delete item "+position, Toast.LENGTH_SHORT).show();
+                                       profileFragment.deletePost(position);
                                         break;
                                 }
 

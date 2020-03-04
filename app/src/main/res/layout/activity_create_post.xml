@@ -90,7 +90,7 @@
                     android:layout_weight="0.2"
                     android:background="@drawable/white_background_no_border"
                     android:elevation="0dp"
-                    android:onClick="editPost"
+                    android:onClick="post"
                     android:text="@string/post" />
             </LinearLayout>
 

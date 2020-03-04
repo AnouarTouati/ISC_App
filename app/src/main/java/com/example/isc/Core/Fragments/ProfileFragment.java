@@ -262,7 +262,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private  void dataUpdatedNotifyListView() {
-        adapter = new ProfilePostsListAdapter(getContext(), R.layout.activity_profile_post_list_adapter, postArrayList);
+        adapter = new ProfilePostsListAdapter(getContext(), R.layout.activity_profile_post_list_adapter, postArrayList,this);
         profilePostsListView.setAdapter(adapter);
         profilePostsListView.setScrollContainer(false);
     }
@@ -342,6 +342,20 @@ public class ProfileFragment extends Fragment {
                 Toast.makeText(getContext(), "inputStream is null", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    public void deletePost(final int postPosition){
+
+        firebaseFirestore.collection("AllPosts").document(firebaseUser.getUid()).collection("userPosts").document(postArrayList.get(postPosition).getPostID()).delete();
+        StorageReference imageReference=firebaseStorage.getReference();
+        imageReference=imageReference.child("images/"+firebaseUser.getUid()+"/"+postArrayList.get(postPosition).getPostID()+".JPEG");
+        imageReference.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                postArrayList.remove(postPosition);
+                dataUpdatedNotifyListView();
+            }
+        });
     }
 
     private static final String ARG_PARAM1 = "param1";

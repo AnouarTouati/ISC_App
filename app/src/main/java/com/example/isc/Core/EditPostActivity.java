@@ -111,6 +111,12 @@ public class EditPostActivity extends AppCompatActivity {
             epEventsTextView.setText(epEvents);
         }
         editPostButton = findViewById(R.id.editPostButton);
+        editPostButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editPost();
+            }
+        });
         editPostButton.setTextColor(Color.GRAY);
         epImage = findViewById(R.id.epImage);
         epShowPostLevelImageButton = findViewById(R.id.epShowPostLevelImageButton);
@@ -184,9 +190,15 @@ public class EditPostActivity extends AppCompatActivity {
         postDataBeforeModification.add(myPost.getMyPostTagColleague());
         postDataBeforeModification.add(myPost.getMyPostLevel());
         postDataBeforeModification.add(myPost.getMyPostEvents());
+
+        if(epImageAsBitmap!=null){
+            epPhotoLLTextView.setText("Remove photo");
+            editPostButton.setTextColor(Color.BLACK);
+        }
     }
 
-    public void editPost(View view) {
+    public void editPost() {
+
         if (epEditText.getText().toString().length() > 0 || epImageAsBitmap != null) {
 
             progressDialog.setMessage("Updating post...");
@@ -299,7 +311,7 @@ public class EditPostActivity extends AppCompatActivity {
         epCheckedDepartments = postDataBeforeModification.get(3).toString();
         epEventsTextView.setText(postDataBeforeModification.get(4).toString());
 
-        editPost(new View(this));
+        editPost();
     }
 
     private void goBackToCoreActivity() {

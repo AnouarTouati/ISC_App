@@ -78,7 +78,6 @@
                     android:layout_height="match_parent"
                     android:background="@drawable/white_background_no_border"
                     android:text="@string/edit"
-                    android:onClick="editPost"
                     android:elevation="0dp"/>
             </LinearLayout>
             <TextView
