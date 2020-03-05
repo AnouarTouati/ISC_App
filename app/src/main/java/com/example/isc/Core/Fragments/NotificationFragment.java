@@ -23,6 +23,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -63,7 +64,8 @@ public class NotificationFragment extends Fragment {
 
 
   private  void listenToNotificationFromFirestore(){
-     firebaseFirestore.collection("Notifications").addSnapshotListener(new EventListener<QuerySnapshot>() {
+
+     firebaseFirestore.collection("Notifications").orderBy("notificationTimeInMillis", Query.Direction.DESCENDING).addSnapshotListener(new EventListener<QuerySnapshot>() {
          @Override
          public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                  notificationArrayList.clear();
@@ -74,7 +76,6 @@ public class NotificationFragment extends Fragment {
                      String notificationTime=notificationSnaps.get(i).get("notificationTime").toString();
                      getUserProfileAndAddNotification(userID,notificationText,notificationTime,i);
                  }
-
          }
      });
     }

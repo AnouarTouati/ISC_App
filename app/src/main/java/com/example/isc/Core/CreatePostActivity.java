@@ -182,6 +182,7 @@ public class CreatePostActivity extends AppCompatActivity {
             map.put("cpText", cpEditText.getText().toString());
             map.put("postID", UUID.randomUUID().toString());
             map.put("date", Timestamp.now());
+            map.put("dateInMillis",Timestamp.now().toDate().getTime());
             if (cpImageAsBitmap != null) {
                 map.put("imageReferenceInStorage", "images/" + firebaseUser.getUid() + "/" + map.get("postID") + ".JPEG");
             } else {
@@ -233,10 +234,11 @@ public class CreatePostActivity extends AppCompatActivity {
 
                 if(Objects.requireNonNull(task.getResult()).contains("date")){
                     map.put("notificationTime", Objects.requireNonNull(task.getResult().getTimestamp("date")).toDate().toString());
-
+                    map.put("notificationTimeInMillis",task.getResult().getLong("dateInMillis"));
                 }
                 else{
                     map.put("notificationTime","");
+                    map.put("notificationTimeInMillis",0);
                 }
 
                 firebaseFirestore.collection("Notifications").document(postID).set(map).addOnCompleteListener(new OnCompleteListener<Void>() {

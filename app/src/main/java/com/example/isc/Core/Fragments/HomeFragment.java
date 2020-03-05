@@ -26,6 +26,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -115,7 +116,7 @@ public class HomeFragment extends Fragment {
         postArrayList.clear();//this shouldn't be  here since we dont know if we will receive new data solve it later
         for (int i = 0; i < allUsersProfiles.size(); i++) {
             final int finalI = i;
-            firebaseFirestore.collection("AllPosts").document(allUsersProfiles.get(i).getUserID()).collection("userPosts").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            firebaseFirestore.collection("AllPosts").document(allUsersProfiles.get(i).getUserID()).collection("userPosts").orderBy("dateInMillis", Query.Direction.DESCENDING).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                     if (task.isSuccessful()) {
