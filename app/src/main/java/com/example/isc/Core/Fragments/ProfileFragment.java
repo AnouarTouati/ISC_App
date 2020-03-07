@@ -229,7 +229,7 @@ public class ProfileFragment extends Fragment {
 
  }
     private void getUserPosts() {
-        firebaseFirestore.collection("AllPosts").document(firebaseUser.getUid()).collection("userPosts").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        firebaseFirestore.collection("AllPosts").whereEqualTo("userID",firebaseUser.getUid()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
@@ -346,7 +346,7 @@ public class ProfileFragment extends Fragment {
 
     public void deletePost(final int postPosition){
 
-        firebaseFirestore.collection("AllPosts").document(firebaseUser.getUid()).collection("userPosts").document(postArrayList.get(postPosition).getPostID()).delete();
+        firebaseFirestore.collection("AllPosts").document(postArrayList.get(postPosition).getPostID()).delete();
         StorageReference imageReference=firebaseStorage.getReference();
         imageReference=imageReference.child("images/"+firebaseUser.getUid()+"/"+postArrayList.get(postPosition).getPostID()+".JPEG");
         imageReference.delete().addOnCompleteListener(new OnCompleteListener<Void>() {

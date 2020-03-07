@@ -132,8 +132,14 @@ public class FinishSignUpActivity extends AppCompatActivity {
                             addFullProfileToDataBase(name,positionSelected,department);
                         }
                     }
-                });
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.v("ConnectivityFireBase",e.getMessage() +" the  cause is "+e.getCause() );
 
+                Toast.makeText(getApplicationContext(),"Something went wrong and we couldn't sign you up",Toast.LENGTH_LONG).show();
+            }
+        });
 
     }
   private void pushPostImageToServer(final String imageReferenceInStorage, final Bitmap imageToPush) {

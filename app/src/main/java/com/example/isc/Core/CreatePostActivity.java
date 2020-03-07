@@ -176,6 +176,7 @@ public class CreatePostActivity extends AppCompatActivity {
 
 
             final Map<String, Object> map = new HashMap<>();
+            map.put("userID",firebaseUser.getUid());
             map.put("checkedDepartments", checkedDepartments);
             map.put("events", events);
             map.put("colleagues", colleagues);
@@ -189,8 +190,7 @@ public class CreatePostActivity extends AppCompatActivity {
                 map.put("imageReferenceInStorage", "");
             }
 
-
-            firebaseFirestore.collection("AllPosts").document(/*aka users*/firebaseUser.getUid()).collection("userPosts").document(map.get("postID").toString()).set(map).
+            firebaseFirestore.collection("AllPosts").document(map.get("postID").toString()).set(map).
                     addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
@@ -224,7 +224,7 @@ public class CreatePostActivity extends AppCompatActivity {
     }
 
     private  void createNotificationDataOnServer(final String checkedDepartments, final String postID){
-        firebaseFirestore.collection("AllPosts").document(/*aka users*/firebaseUser.getUid()).collection("userPosts").document(postID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        firebaseFirestore.collection("AllPosts").document(postID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 Map<String,Object> map=new HashMap<>();

@@ -18,7 +18,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.isc.Core.CoreActivity;
 import com.example.isc.Entry.EntryActivity;
 import com.example.isc.R;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -34,7 +37,7 @@ public class LoginActivity extends AppCompatActivity {
     private Button loginButton;
     private ProgressDialog progressDialog;
     private FirebaseAuth firebaseAuth;
-
+   private final int  PLAY_SERVICES_RESOLUTION_REQUEST=400;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,9 +66,19 @@ public class LoginActivity extends AppCompatActivity {
                 return false;
             }
         });
-
+        checkGooglePlayServices();
     }
 
+    private void  checkGooglePlayServices(){
+
+        GoogleApiAvailability apiAvailability=GoogleApiAvailability.getInstance();
+        if(!(apiAvailability.isGooglePlayServicesAvailable(this)== ConnectionResult.SUCCESS)){
+         apiAvailability.getErrorDialog(this,apiAvailability.isGooglePlayServicesAvailable(this),PLAY_SERVICES_RESOLUTION_REQUEST).show();
+        }
+        else{
+            Toast.makeText(this,"Play Services Up To Date",Toast.LENGTH_LONG).show();
+        }
+    }
     public void loginUser(View view){
         String email = loginEmail.getText().toString();
         String password  = loginPassword.getText().toString();
@@ -87,6 +100,7 @@ public class LoginActivity extends AppCompatActivity {
        firebaseAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
            @Override
            public void onComplete(@NonNull Task<AuthResult> task) {
+
                if(task.isSuccessful()){
                    startActivity(new Intent(getApplicationContext(),CoreActivity.class));
                    Log.v("ConnectivityFireBase","Successfully logged in");
@@ -98,6 +112,7 @@ public class LoginActivity extends AppCompatActivity {
                    }
 
                    catch (FirebaseAuthException e){
+
                        switch (e.getErrorCode()){
 
                            case  "ERROR_USER_DISABLED"  : Toast.makeText(getApplicationContext(),"Your account has been disabled",Toast.LENGTH_LONG).show(); break;
@@ -116,6 +131,34 @@ public class LoginActivity extends AppCompatActivity {
 
                    progressDialog.dismiss();
                }
+           }
+       }).addOnFailureListener(new OnFailureListener() {
+           @Override
+           public void onFailure(@NonNull Exception e) {
+               try{
+                   throw Objects.requireNonNull(e);
+
+               }
+
+               catch (FirebaseAuthException ee){
+
+                   switch (ee.getErrorCode()){
+
+                       case  "ERROR_USER_DISABLED"  : Toast.makeText(getApplicationContext(),"Your account has been disabled",Toast.LENGTH_LONG).show(); break;
+                       case  "ERROR_USER_NOT_FOUND" : Toast.makeText(getApplicationContext(),"This account doesn't exist",Toast.LENGTH_LONG).show();break;
+                       case  "ERROR_WRONG_PASSWORD" : Toast.makeText(getApplicationContext(),"Invalid Password",Toast.LENGTH_LONG).show();break;
+                       default: Toast.makeText(getApplicationContext(),"Something went wrong and we couldn't sign you in",Toast.LENGTH_LONG).show();
+                           Log.v("ConnectivityFireBase",e.getMessage() +" the  cause is "+e.getCause() );break;
+
+                   }
+               }
+               catch (Exception ee) {
+
+                   Log.v("ConnectivityFireBase",ee.getMessage() +" the  cause is "+ee.getCause() );
+                   Toast.makeText(getApplicationContext(),"Something went wrong and we couldn't sign you in",Toast.LENGTH_LONG).show();
+               }
+
+               progressDialog.dismiss();
            }
        });
 

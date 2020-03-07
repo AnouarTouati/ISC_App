@@ -84,61 +84,65 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        getAllUsersProfiles();
+        getUserPosts();
 
         return fragmentView;
     }
 
 
-    private void getAllUsersProfiles() {
-        firebaseFirestore.collection("Profiles").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    allUsersProfiles.clear();
-                    List<DocumentSnapshot> allProfiles = Objects.requireNonNull(task.getResult()).getDocuments();
-                    for (int i = 0; i < allProfiles.size(); i++) {
-                        MyUser user = new MyUser(allProfiles.get(i).getId(), null, Objects.requireNonNull(allProfiles.get(i).get("name")).toString(), Common.position[Objects.requireNonNull(allProfiles.get(i).getLong("position")).intValue()]);
-                        allUsersProfiles.add(user);
-                        //we check for valid reference inside getImageFromServer method
-                        getImageFromServer(Objects.requireNonNull(allProfiles.get(i).get("profileImageReferenceInStorage")).toString(), allUsersProfiles.size() - 1, -999/*aka we wont need this parameter, it is profile image*/, true);
-                    }
-                    getUserPosts();
-                } else {
-                    Log.d("ConnectivityFireBase", "Something went wrong couldn't load usersProfiles " + task.getException().toString());
-                }
+    private void getUserProfile(String userID, final int theIndexOfPostThatRequestedThisProfile) {
 
+        boolean weAlreadyHaveThatProfile=false;
+        for(int i=0;i<allUsersProfiles.size();i++){
+            if(allUsersProfiles.get(i).getUserID().equals(userID)){
+                weAlreadyHaveThatProfile=true;
+                postArrayList.get(theIndexOfPostThatRequestedThisProfile).setMyUser(allUsersProfiles.get(i));
+                break;
             }
-        });
+        }
+        if(!weAlreadyHaveThatProfile){
+            firebaseFirestore.collection("Profiles").document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    MyUser user = new MyUser(task.getResult().getId(), null, Objects.requireNonNull(task.getResult().get("name")).toString(), Common.position[Objects.requireNonNull(task.getResult().getLong("position")).intValue()]);
+                    allUsersProfiles.add(user);
+                    postArrayList.get(theIndexOfPostThatRequestedThisProfile).setMyUser(user);
+                    getImageFromServer(Objects.requireNonNull(task.getResult().get("profileImageReferenceInStorage")).toString(), theIndexOfPostThatRequestedThisProfile, allUsersProfiles.size()-1, true);
+                }
+            });
+}
+
     }
 
     private  void getUserPosts() {
-        postArrayList.clear();//this shouldn't be  here since we dont know if we will receive new data solve it later
-        for (int i = 0; i < allUsersProfiles.size(); i++) {
-            final int finalI = i;
-            firebaseFirestore.collection("AllPosts").document(allUsersProfiles.get(i).getUserID()).collection("userPosts").orderBy("dateInMillis", Query.Direction.DESCENDING).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        postArrayList.clear();
+        allUsersProfiles.clear();
+            firebaseFirestore.collection("AllPosts").orderBy("dateInMillis", Query.Direction.DESCENDING).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                     if (task.isSuccessful()) {
-                        List<DocumentSnapshot> allPostByThisUser = Objects.requireNonNull(task.getResult()).getDocuments();
-                        for (int j = 0; j < allPostByThisUser.size(); j++) {
-                            DocumentSnapshot snapshot = allPostByThisUser.get(j);
+                        postArrayList.clear();
+                        List<DocumentSnapshot> allPosOfAllUsers = Objects.requireNonNull(task.getResult()).getDocuments();
+
+                        for (int j = 0; j < allPosOfAllUsers.size(); j++) {
+                            DocumentSnapshot snapshot = allPosOfAllUsers.get(j);
 
                             String cpText = Objects.requireNonNull(snapshot.get("cpText")).toString();
                             String checkedDepartments = Objects.requireNonNull(snapshot.get("checkedDepartments")).toString();
                             String colleagues = Objects.requireNonNull(snapshot.get("colleagues")).toString();
                             String events = Objects.requireNonNull(snapshot.get("events")).toString();
                             String postID= Objects.requireNonNull(snapshot.get("postID")).toString();
+
                             if(!Objects.requireNonNull(snapshot.get("imageReferenceInStorage")).toString().equals("")){
                                 Bitmap placeHolderImage = BitmapFactory.decodeResource(getResources(), R.drawable.post_image_placeholder);
-                                postArrayList.add(new MyPost(postID,allUsersProfiles.get(finalI), j, cpText, placeHolderImage, checkedDepartments, colleagues, events));
+                                postArrayList.add(new MyPost(postID,null, j, cpText, placeHolderImage, checkedDepartments, colleagues, events));
                                 String imageReferenceInStorage = Objects.requireNonNull(snapshot.get("imageReferenceInStorage")).toString();
-                                getImageFromServer(imageReferenceInStorage, finalI/*aka index where the image should be placed*/, j, false);
+                                getImageFromServer(imageReferenceInStorage, postArrayList.size()-1/*aka index where the image should be placed*/, j, false);
                             }
                            else {
-                                postArrayList.add(new MyPost(postID,allUsersProfiles.get(finalI), j, cpText, null, checkedDepartments, colleagues, events));
+                                postArrayList.add(new MyPost(postID,null, j, cpText, null, checkedDepartments, colleagues, events));
                             }
-
+                            getUserProfile(snapshot.get("userID").toString(),j);
                             dataUpdatedNotifyListView();
                         }
 
@@ -148,11 +152,10 @@ public class HomeFragment extends Fragment {
                     }
                 }
             });
-        }
 
     }
 
-    private void getImageFromServer(String storageReferencePath, final int allUsersProfilesIndex, final int indexOfPostForThisUser, final boolean aProfileImage) {
+    private void getImageFromServer(String storageReferencePath, final int postArrayListIndex, final int profileIndex, final boolean aProfileImage) {
         if (storageReferencePath != null) {
             if (!storageReferencePath.equals("")) {
 
@@ -165,25 +168,17 @@ public class HomeFragment extends Fragment {
                         if (task.isSuccessful()) {
                             if (!aProfileImage) {
 
-                                int theExactPostFromTheExactUser = findIndexOfTheExactPost(allUsersProfiles.get(allUsersProfilesIndex), indexOfPostForThisUser);
-                                if (theExactPostFromTheExactUser != -1) {
-                                    MyPost aPost = postArrayList.get(theExactPostFromTheExactUser);
+                                    MyPost aPost = postArrayList.get(postArrayListIndex);
                                     aPost.setPostedImage(BitmapFactory.decodeByteArray(Objects.requireNonNull(task.getResult()).clone(), 0, task.getResult().length));
-                                    postArrayList.remove(theExactPostFromTheExactUser);
-                                    postArrayList.add(theExactPostFromTheExactUser, aPost);
+                                    postArrayList.remove(postArrayListIndex);
+                                    postArrayList.add(postArrayListIndex, aPost);
                                     dataUpdatedNotifyListView();
-                                } else {
-                                    Log.v("ConnectivityFireBase", "Could not find the exact post of user");
-                                }
 
                             } else {
-                                ArrayList<Integer> postsIndexes = findIndexesOfThePostWithThisUserProfile(allUsersProfiles.get(allUsersProfilesIndex));
-                                for (int i = 0; i < postsIndexes.size(); i++) {
-                                    allUsersProfiles.get(allUsersProfilesIndex).setProfileImageBitmap((BitmapFactory.decodeByteArray(Objects.requireNonNull(task.getResult()).clone(), 0, task.getResult().length)));
-                                    postArrayList.get(postsIndexes.get(i)).setMyUser(allUsersProfiles.get(allUsersProfilesIndex));
-                                    dataUpdatedNotifyListView();
 
-                                }
+                                    allUsersProfiles.get(profileIndex).setProfileImageBitmap((BitmapFactory.decodeByteArray(Objects.requireNonNull(task.getResult()).clone(), 0, task.getResult().length)));
+                                    postArrayList.get(postArrayListIndex).setMyUser(allUsersProfiles.get(profileIndex));
+                                    dataUpdatedNotifyListView();
 
                             }
 
@@ -192,50 +187,11 @@ public class HomeFragment extends Fragment {
                         }
                     }
                 });
-            } else {
-                if (!aProfileImage) {
-                    addPostToArrayListWithoutImage(allUsersProfiles.get(allUsersProfilesIndex), indexOfPostForThisUser);
-                }
-
             }
 
-        } else {
-            if (!aProfileImage) {
-                addPostToArrayListWithoutImage(allUsersProfiles.get(allUsersProfilesIndex), indexOfPostForThisUser);
-            }
-        }
-
+    }
     }
 
-    private void addPostToArrayListWithoutImage(MyUser aUser, int indexOfPostForThisUser) {
-        int postIndex = findIndexOfTheExactPost(aUser, indexOfPostForThisUser);
-        MyPost aPost = postArrayList.get(postIndex);
-        aPost.setPostedImage(null);
-        postArrayList.remove(postIndex);
-        postArrayList.add(postIndex, aPost);
-        dataUpdatedNotifyListView();
-    }
-
-    private ArrayList<Integer> findIndexesOfThePostWithThisUserProfile(MyUser aUser) {
-        ArrayList<Integer> indexes = new ArrayList<>();
-        for (int i = 0; i < postArrayList.size(); i++) {
-            MyPost aPost = postArrayList.get(i);
-            if (aPost.getMyUser().getUserID().equals(aUser.getUserID())) {
-                indexes.add(i);
-            }
-        }
-        return indexes;
-    }
-
-    private int findIndexOfTheExactPost(MyUser aUser, int indexOfPostForThisUser) {
-        for (int i = 0; i < postArrayList.size(); i++) {
-            MyPost aPost = postArrayList.get(i);
-            if (aPost.getMyUser().getUserID().equals(aUser.getUserID()) && aPost.getIndexOfPostForThisUser() == indexOfPostForThisUser) {
-                return i;
-            }
-        }
-        return -1;//failed to find the post
-    }
 
     private void dataUpdatedNotifyListView() {
         homeListAdapter = new HomeListAdapter(getContext(), R.layout.activity_home_list_adapter, postArrayList);

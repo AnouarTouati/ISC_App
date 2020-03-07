@@ -206,12 +206,14 @@ public class EditPostActivity extends AppCompatActivity {
 
 
             final Map<String, Object> map = new HashMap<>();
+            map.put("userID",firebaseUser.getUid());
             map.put("checkedDepartments", epCheckedDepartments);
             map.put("events", epEvents);
             map.put("colleagues", epColleagues);
             map.put("cpText", epEditText.getText().toString());
             map.put("postID", postID);
             map.put("date", Timestamp.now());
+            map.put("dateInMillis",Timestamp.now().toDate().getTime());
             if (epImageAsBitmap != null) {
                 map.put("imageReferenceInStorage", "images/" + firebaseUser.getUid() + "/" + map.get("postID") + ".JPEG");
             } else {
@@ -222,7 +224,7 @@ public class EditPostActivity extends AppCompatActivity {
             }
 
 
-            firebaseFirestore.collection("AllPosts").document(/*aka users*/firebaseUser.getUid()).collection("userPosts").document(map.get("postID").toString()).set(map).
+            firebaseFirestore.collection("AllPosts").document(map.get("postID").toString()).set(map).
                     addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
@@ -331,9 +333,11 @@ public class EditPostActivity extends AppCompatActivity {
 
                 if (Objects.requireNonNull(task.getResult()).contains("date")) {
                     map.put("notificationTime", Objects.requireNonNull(task.getResult().getTimestamp("date")).toDate().toString());
+                    map.put("notificationTimeInMillis",task.getResult().getLong("dateInMillis"));
 
                 } else {
                     map.put("notificationTime", "");
+                    map.put("notificationTimeInMillis",0);
                 }
 
                 firebaseFirestore.collection("Notifications").document(postID).set(map).addOnCompleteListener(new OnCompleteListener<Void>() {

@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.isc.Core.CoreActivity;
 import com.example.isc.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -109,7 +110,14 @@ public class SignUpActivity extends AppCompatActivity {
                         }
                         progressDialog.dismiss();
                     }
-                });
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.v("ConnectivityFireBase",e.getMessage() +" the  cause is "+e.getCause() );
+
+                Toast.makeText(getApplicationContext(),"Something went wrong and we couldn't sign you up",Toast.LENGTH_LONG).show();
+            }
+        });
 
 
 

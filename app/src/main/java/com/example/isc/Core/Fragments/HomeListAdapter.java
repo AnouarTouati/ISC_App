@@ -56,6 +56,7 @@ public class HomeListAdapter extends ArrayAdapter<MyPost> {
         post = getItem(position);
 
         if (post != null) {
+            if(post.getMyUser()!=null){
             if (posterName != null) {
                 holder.posterName.setText(post.getMyUser().getFullName());
             }
@@ -63,21 +64,21 @@ public class HomeListAdapter extends ArrayAdapter<MyPost> {
                 holder.posterPosition.setText(post.getMyUser().getPosition());
             }
             if (postedText != null) {
-                if(post.getPostedText().length()>100){
-                    text = post.getPostedText().substring(0, 99) +"... "+ Html.fromHtml("<font font-weight=bold> See more </font>");
+                if (post.getPostedText().length() > 100) {
+                    text = post.getPostedText().substring(0, 99) + "... " + Html.fromHtml("<font font-weight=bold> See more </font>");
                     textDisplayedAll = false;
                     holder.postedText.setText(text);
-                }else{
+                } else {
                     holder.postedText.setText(post.getPostedText());
                     textDisplayedAll = true;
                 }
                 holder.postedText.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(textDisplayedAll){
+                        if (textDisplayedAll) {
                             holder.postedText.setText(text);
                             textDisplayedAll = false;
-                        }else{
+                        } else {
                             holder.postedText.setText(post.getPostedText());
                             textDisplayedAll = true;
                         }
@@ -89,10 +90,10 @@ public class HomeListAdapter extends ArrayAdapter<MyPost> {
                 holder.posterProfileImage.setDrawingCacheEnabled(true);
             }
             if (postedImage != null) {
-                if(post.getPostedImageBitmap()!=null) {
+                if (post.getPostedImageBitmap() != null) {
                     holder.postedImage.setImageBitmap(post.getPostedImageBitmap());
-                    holder.postedImage.setDrawingCacheEnabled(true);
-                }else{
+                    holder.postedImage.setVisibility(View.VISIBLE);
+                } else {
                     holder.postedImage.setVisibility(View.GONE);
                 }
             }
@@ -130,10 +131,11 @@ public class HomeListAdapter extends ArrayAdapter<MyPost> {
                     }
                 });
             }
-            if(postEvents != null){
+            if (postEvents != null) {
                 postEvents.setText(post.getMyPostEvents());
             }
         }
+    }
         holder.posterProfileLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

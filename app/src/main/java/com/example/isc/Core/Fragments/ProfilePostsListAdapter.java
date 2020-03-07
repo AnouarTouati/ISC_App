@@ -91,13 +91,12 @@ public class ProfilePostsListAdapter extends ArrayAdapter<MyPost> {
             }
             if (posterProfileImage != null) {
                 holder.posterProfileImage.setImageBitmap(post.getMyUser().getProfileImageBitmap());
-                holder.posterProfileImage.setDrawingCacheEnabled(true);
             }
             if (postedImage != null) {
 
                 if(post.getPostedImageBitmap()!=null){
                     holder.postedImage.setImageBitmap(post.getPostedImageBitmap());
-                    holder.postedImage.setDrawingCacheEnabled(true);
+                    holder.postedImage.setVisibility(View.VISIBLE);
                 }else{
                     holder.postedImage.setVisibility(View.GONE);
                 }
