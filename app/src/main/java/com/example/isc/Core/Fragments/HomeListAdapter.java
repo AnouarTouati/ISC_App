@@ -61,7 +61,7 @@ public class HomeListAdapter extends ArrayAdapter<MyPost> {
                 holder.posterName.setText(post.getMyUser().getFullName());
             }
             if (posterPosition != null) {
-                holder.posterPosition.setText(post.getMyUser().getPosition());
+                holder.posterPosition.setText(post.getMyUser().getPositionAsString());
             }
             if (postedText != null) {
                 if (post.getPostedText().length() > 100) {
@@ -139,7 +139,7 @@ public class HomeListAdapter extends ArrayAdapter<MyPost> {
         holder.posterProfileLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String[] s = {post.getMyUser().getFullName(), post.getMyUser().getPosition()};
+                String[] s = {post.getMyUser().getFullName(), post.getMyUser().getPositionAsString()};
                 Intent intent = new Intent(getContext(), ShowUserProfileActivity.class);
                 intent.putExtra("user", s);
                 getContext().startActivity(intent);

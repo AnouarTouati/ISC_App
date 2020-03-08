@@ -12,10 +12,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,11 +54,11 @@ public class ProfileFragment extends Fragment {
     private ImageView profileImage;
     private Bitmap profileImageAsBitmap;
     private LinearLayout nameLayout, positionLayout, studentNumberLayout, emailLayout, postLayout;
-    private TextView nameTextView, positionTextView, studentNumberTextView, emailTextView;
-    private EditText nameEditText, positionEditText;
+    private TextView nameTextView,  studentNumberTextView, emailTextView,positionTextView;
+    private Spinner editPositionSpinner;
+    private EditText nameEditText;
     private ImageView editNameIV, editPositionIV, showProfilePostIV;
     private static final int PICK_IMAGE = 1;
-
     private MyUser myUser0;
 
     private Boolean n = false, p = false, s = false, e = false, postIsVisible = false;
@@ -74,6 +76,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View fragmentView = inflater.inflate(R.layout.fragment_profile, container, false);
+
 
         progressDialog=new ProgressDialog(getContext());
         initialize(fragmentView);
@@ -123,12 +126,13 @@ public class ProfileFragment extends Fragment {
 
         nameTextView = fragmentView.findViewById(R.id.profileNameTextView);
         positionTextView = fragmentView.findViewById(R.id.profilePositionTextView);
+        ArrayAdapter<String> spinnerAdapter=new ArrayAdapter<>(getActivity(),R.layout.support_simple_spinner_dropdown_item,Common.position);
         studentNumberTextView = fragmentView.findViewById(R.id.profileStudentNumberTextView);
         emailTextView = fragmentView.findViewById(R.id.profileEmailTextView);
 
         nameEditText = fragmentView.findViewById(R.id.nameEditText);
-        positionEditText = fragmentView.findViewById(R.id.positionEditText);
-
+        editPositionSpinner = fragmentView.findViewById(R.id.editPositionSpinner);
+        editPositionSpinner.setAdapter(spinnerAdapter);
 
         editNameIV = fragmentView.findViewById(R.id.editName);
         editPositionIV = fragmentView.findViewById(R.id.editPosition);
@@ -174,8 +178,14 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 positionTextView.setVisibility(View.GONE);
-                positionEditText.setVisibility(View.VISIBLE);
-                positionEditText.setText(positionTextView.getText());
+                editPositionSpinner.setVisibility(View.VISIBLE);
+                if(Common.convertPostionStringToInt(positionTextView.getText().toString())!=-1){
+                    Log.v("AppLogic","Got index of club position");
+                    editPositionSpinner.setSelection(Common.convertPostionStringToInt(positionTextView.getText().toString()));
+                }else {
+                   Toast.makeText(getContext(),"Something went wrong while displaying your postion in the club",Toast.LENGTH_LONG).show();
+                    Log.v("AppLogic","Something went wrong while getting index of club position");
+                }
                 editPositionIV.setImageResource(R.drawable.ic_add_gray_24dp);
                 p = true;
             }
@@ -184,14 +194,21 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (p) {
+                    updateClubPosition(editPositionSpinner.getSelectedItemPosition());
                     positionTextView.setVisibility(View.VISIBLE);
-                    positionEditText.setVisibility(View.GONE);
+                    editPositionSpinner.setVisibility(View.GONE);
                     editPositionIV.setImageResource(R.drawable.ic_edit_black_24dp);
                     p = false;
                 } else {
                     positionTextView.setVisibility(View.GONE);
-                    positionEditText.setVisibility(View.VISIBLE);
-                    positionEditText.setText(positionTextView.getText());
+                    editPositionSpinner.setVisibility(View.VISIBLE);
+                    if(Common.convertPostionStringToInt(positionTextView.getText().toString())!=-1){
+                        Log.v("AppLogic","Got index of club position");
+                        editPositionSpinner.setSelection(Common.convertPostionStringToInt(positionTextView.getText().toString()));
+                    }else {
+                        Toast.makeText(getContext(),"Something went wrong while displaying your postion in the club",Toast.LENGTH_LONG).show();
+                        Log.v("AppLogic","Something went wrong while getting index of club position");
+                    }
                     editPositionIV.setImageResource(R.drawable.ic_add_gray_24dp);
                     p = true;
                 }
@@ -201,6 +218,17 @@ public class ProfileFragment extends Fragment {
         profilePostsUpButton = fragmentView.findViewById(R.id.profileUpButton);
     }
 
+    private  void updateClubPosition(final int newClubPosition){
+        firebaseFirestore.collection("Profiles").document(firebaseUser.getUid()).update("position",newClubPosition).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+               if(task.isSuccessful()){
+                   positionTextView.setText(Common.position[newClubPosition]);
+                   myUser0.setPosition(newClubPosition);
+               }
+            }
+        });
+    }
     private void getUserProfile(){
      firebaseFirestore = FirebaseFirestore.getInstance();
 
@@ -210,11 +238,11 @@ public class ProfileFragment extends Fragment {
              if (task.isSuccessful()) {
 
                  //i will deal with the image later
-                 myUser0 = new MyUser(firebaseUser.getUid(),null, (String) Objects.requireNonNull(task.getResult()).get("name"), Common.position[Objects.requireNonNull(task.getResult().getLong("position")).intValue()]);
+                 myUser0 = new MyUser(firebaseUser.getUid(),null, (String) Objects.requireNonNull(task.getResult()).get("name"), Objects.requireNonNull(task.getResult().getLong("position")).intValue());
                  Log.v("ConnectivityFireBase", "Received profile successfully");
 
                  nameTextView.setText(myUser0.getFullName());
-                 positionTextView.setText(myUser0.getPosition());
+                 positionTextView.setText(myUser0.getPositionAsString());
                  studentNumberTextView.setText("Not Implemented yet");
                  emailTextView.setText(firebaseUser.getEmail());
                  //we check for valid reference inside getImageFromServer method

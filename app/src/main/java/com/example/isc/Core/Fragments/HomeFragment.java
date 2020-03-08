@@ -104,7 +104,7 @@ public class HomeFragment extends Fragment {
             firebaseFirestore.collection("Profiles").document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    MyUser user = new MyUser(task.getResult().getId(), null, Objects.requireNonNull(task.getResult().get("name")).toString(), Common.position[Objects.requireNonNull(task.getResult().getLong("position")).intValue()]);
+                    MyUser user = new MyUser(task.getResult().getId(), null, Objects.requireNonNull(task.getResult().get("name")).toString(), Objects.requireNonNull(task.getResult().getLong("position")).intValue());
                     allUsersProfiles.add(user);
                     postArrayList.get(theIndexOfPostThatRequestedThisProfile).setMyUser(user);
                     getImageFromServer(Objects.requireNonNull(task.getResult().get("profileImageReferenceInStorage")).toString(), theIndexOfPostThatRequestedThisProfile, allUsersProfiles.size()-1, true);

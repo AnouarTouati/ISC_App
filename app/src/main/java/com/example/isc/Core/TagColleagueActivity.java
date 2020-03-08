@@ -111,7 +111,7 @@ public class TagColleagueActivity extends Fragment {
                     colleagues.clear();
                     List<DocumentSnapshot> allProfiles = Objects.requireNonNull(task.getResult()).getDocuments();
                     for (int i = 0; i < allProfiles.size(); i++) {
-                        MyUser user = new MyUser(allProfiles.get(i).getId(), null, Objects.requireNonNull(allProfiles.get(i).get("name")).toString(), Common.position[Objects.requireNonNull(allProfiles.get(i).getLong("position")).intValue()]);
+                        MyUser user = new MyUser(allProfiles.get(i).getId(), null, Objects.requireNonNull(allProfiles.get(i).get("name")).toString(), Objects.requireNonNull(allProfiles.get(i).getLong("position")).intValue());
                         colleagues.add(user);
                         //we check for valid reference inside getImageFromServer method
                         getUserProfileImage(Objects.requireNonNull(allProfiles.get(i).get("profileImageReferenceInStorage")).toString(), i);

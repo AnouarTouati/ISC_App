@@ -55,7 +55,7 @@ public class ShowUserProfileActivity extends AppCompatActivity {
         userEmail = findViewById(R.id.userEmailTextView);
         userPostsUpButton = findViewById(R.id.userProfileUpButton);
 
-        MyUser myUser0 = new MyUser("Garbage",null, "Bettouche", "Member");
+        MyUser myUser0 = new MyUser("Garbage",null, "Bettouche", 1);
 /*
         final MyPost myPost0 = new MyPost(
                 myUser0,

@@ -84,7 +84,7 @@ public class NotificationFragment extends Fragment {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
            if (task.isSuccessful()){
-               MyUser user= new MyUser(userID,null, (String) task.getResult().get("name"), Common.position[task.getResult().getLong("position").intValue()]);
+               MyUser user= new MyUser(userID,null, (String) task.getResult().get("name"), task.getResult().getLong("position").intValue());
                MyNotification notification=new MyNotification(user,notificationText,notificationTime);
                notificationArrayList.add(notification);
                dataUpdatedNotifyListView();
