@@ -18,6 +18,7 @@ import com.example.isc.Core.MyNotification;
 import com.example.isc.Core.MyUser;
 import com.example.isc.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -90,7 +91,17 @@ public class NotificationFragment extends Fragment {
                dataUpdatedNotifyListView();
                getUserProfileImage(task.getResult().get("profileImageReferenceInStorage").toString(),arrayListIndex);
             }
-        }});
+        }}).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                try{
+                    throw e;
+                }
+                catch (Exception ee){
+                    Log.v("ConnectivityFireBase", "Something went wrong getting profile " + ee.getMessage());
+                }
+            }
+        });
   }
   void getUserProfileImage(String storageReferencePath, final int arrayListIndex){
         //if we don't have a valid path to storage we don't do anything since the Notification is there no exception will occur
@@ -113,6 +124,16 @@ public class NotificationFragment extends Fragment {
 
                         else{
                             Log.d("ConnectivityFireBase", "Something went wrong and we couldn't get images "+task.getException().toString());
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        try{
+                            throw e;
+                        }
+                        catch (Exception ee){
+                            Log.v("ConnectivityFireBase", "Something went wrong and we couldn't get images " + ee.getMessage());
                         }
                     }
                 });

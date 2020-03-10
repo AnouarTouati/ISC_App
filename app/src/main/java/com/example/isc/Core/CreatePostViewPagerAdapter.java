@@ -15,7 +15,7 @@ public class CreatePostViewPagerAdapter extends FragmentPagerAdapter {
         super(fragmentManager,BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
 
     }
-    void addFragment(Fragment fragment){
+    public void addFragment(Fragment fragment){
         fragmentsList.add(fragment);
     }
     @Override

@@ -103,19 +103,22 @@ public class SignUpActivity extends AppCompatActivity {
 
                                 Toast.makeText(getApplicationContext(),"Something went wrong and we couldn't sign you up",Toast.LENGTH_LONG).show();
                             }
-                            FirebaseAuthException e =  (FirebaseAuthException) task.getException();
-                            if(e.getMessage() != null){
-                                Toast.makeText(SignUpActivity.this, e.getMessage(),Toast.LENGTH_LONG).show();
-                            }
+
                         }
                         progressDialog.dismiss();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Log.v("ConnectivityFireBase",e.getMessage() +" the  cause is "+e.getCause() );
+
 
                 Toast.makeText(getApplicationContext(),"Something went wrong and we couldn't sign you up",Toast.LENGTH_LONG).show();
+                try {
+                    throw e;
+                }
+                catch (Exception ee){
+                    Log.v("ConnectivityFireBase",e.getMessage() +" the  cause is "+ee.getCause() );
+                }
             }
         });
 

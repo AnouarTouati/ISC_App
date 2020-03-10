@@ -90,12 +90,20 @@ public class HomeListAdapter extends ArrayAdapter<MyPost> {
                 holder.posterProfileImage.setDrawingCacheEnabled(true);
             }
             if (postedImage != null) {
-                if (post.getPostedImageBitmap() != null) {
-                    holder.postedImage.setImageBitmap(post.getPostedImageBitmap());
-                    holder.postedImage.setVisibility(View.VISIBLE);
-                } else {
+                if(post.hasImage()){
+                    if(post.getPostedImageBitmap()!=null){
+                        holder.postedImage.setImageBitmap(post.getPostedImageBitmap());
+                        holder.postedImage.setVisibility(View.VISIBLE);
+                    }
+                    else{
+                        holder.postedImage.setImageResource(R.drawable.post_image_placeholder);
+                    }
+                }
+                else{
+                    holder.postedImage.setImageBitmap(null);
                     holder.postedImage.setVisibility(View.GONE);
                 }
+
             }
             if (postLevelButton != null) {
                 holder.postLevelButton.setOnClickListener(new View.OnClickListener() {

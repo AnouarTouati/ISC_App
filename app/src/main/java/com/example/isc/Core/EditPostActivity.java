@@ -252,7 +252,13 @@ public class EditPostActivity extends AppCompatActivity {
                 public void onFailure(@NonNull Exception e) {
                     progressDialog.dismiss();
                     Toast.makeText(getApplicationContext(), "Something went wrong we couldn't edit post", Toast.LENGTH_LONG).show();
-                    Log.v("ConnectivityFireBase", "Something went wrong we couldn't edit post" + "Edit Post Data" + e.getMessage());
+
+                    try {
+                        throw e;
+                    }
+                    catch(Exception ee){
+                        Log.v("ConnectivityFireBase", "Something went wrong we couldn't edit post" + "Edit Post Data" + e.getMessage());
+                    }
                 }
             });
         }
@@ -260,7 +266,17 @@ public class EditPostActivity extends AppCompatActivity {
     private void deleteImageFromServer(String postID){
         StorageReference imageReference=firebaseStorage.getReference();
         imageReference=imageReference.child("images/" + firebaseUser.getUid() + "/" + postID + ".JPEG");
-        imageReference.delete();
+        imageReference.delete().addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                try {
+                    throw e;
+                }
+                catch(Exception ee){
+                    Log.v("ConnectivityFireBase", "Something went wrong we couldn't delete image from server" + e.getMessage());
+                }
+            }
+        });
     }
     private void PushPostImageToServer(String imageReferenceInStorage, Bitmap imageToPush, final String postID) {
         StorageReference imageReference = firebaseStorage.getReference();
@@ -348,7 +364,28 @@ public class EditPostActivity extends AppCompatActivity {
                             goBackToCoreActivity();
                         }
                     }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        try {
+                            throw e;
+                        }
+                        catch(Exception ee){
+                            Log.v("ConnectivityFireBase", "Something went wrong we couldn't send notification" + e.getMessage());
+                        }
+                    }
                 });
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                try {
+                    throw e;
+                }
+                catch(Exception ee){
+                    Log.v("ConnectivityFireBase", "Something went wrong we couldn't create notification" + e.getMessage());
+                }
+
             }
         });
 

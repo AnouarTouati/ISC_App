@@ -1,7 +1,6 @@
 package com.example.isc.Core.Fragments;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,6 +21,7 @@ import com.example.isc.Core.MyPost;
 import com.example.isc.Core.MyUser;
 import com.example.isc.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -109,6 +109,16 @@ public class HomeFragment extends Fragment {
                     postArrayList.get(theIndexOfPostThatRequestedThisProfile).setMyUser(user);
                     getImageFromServer(Objects.requireNonNull(task.getResult().get("profileImageReferenceInStorage")).toString(), theIndexOfPostThatRequestedThisProfile, allUsersProfiles.size()-1, true);
                 }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    try{
+                        throw e;
+                    }
+                    catch (Exception ee){
+                        Log.v("ConnectivityFireBase", "Error getting profile " + ee.getMessage());
+                    }
+                }
             });
 }
 
@@ -134,13 +144,13 @@ public class HomeFragment extends Fragment {
                             String postID= Objects.requireNonNull(snapshot.get("postID")).toString();
 
                             if(!Objects.requireNonNull(snapshot.get("imageReferenceInStorage")).toString().equals("")){
-                                Bitmap placeHolderImage = BitmapFactory.decodeResource(getResources(), R.drawable.post_image_placeholder);
-                                postArrayList.add(new MyPost(postID,null, j, cpText, placeHolderImage, checkedDepartments, colleagues, events));
+
+                                postArrayList.add(new MyPost(postID,null, j, cpText, true,null, checkedDepartments, colleagues, events));
                                 String imageReferenceInStorage = Objects.requireNonNull(snapshot.get("imageReferenceInStorage")).toString();
                                 getImageFromServer(imageReferenceInStorage, postArrayList.size()-1/*aka index where the image should be placed*/, j, false);
                             }
                            else {
-                                postArrayList.add(new MyPost(postID,null, j, cpText, null, checkedDepartments, colleagues, events));
+                                postArrayList.add(new MyPost(postID,null, j, cpText, false,null, checkedDepartments, colleagues, events));
                             }
                             getUserProfile(snapshot.get("userID").toString(),j);
                             dataUpdatedNotifyListView();
@@ -149,6 +159,16 @@ public class HomeFragment extends Fragment {
                     } else {
                         Log.v("ConnectivityFireBase", "Error receiving posts " + task.getException());
 
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    try{
+                        throw  e;
+                    }
+                    catch (Exception ee){
+                        Log.v("ConnectivityFireBase", "Error receiving posts " + ee.getMessage());
                     }
                 }
             });
@@ -184,6 +204,16 @@ public class HomeFragment extends Fragment {
 
                         } else {
                             Log.d("ConnectivityFireBase", "Something went wrong and we couldn't get images " + Objects.requireNonNull(task.getException()).toString());
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        try{
+                            throw e;
+                        }
+                        catch (Exception ee){
+                            Log.v("ConnectivityFireBase", "Something went wrong and we couldn't get images " + ee.getMessage());
                         }
                     }
                 });

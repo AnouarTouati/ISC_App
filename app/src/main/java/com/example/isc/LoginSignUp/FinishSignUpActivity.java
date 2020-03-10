@@ -135,9 +135,16 @@ public class FinishSignUpActivity extends AppCompatActivity {
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Log.v("ConnectivityFireBase",e.getMessage() +" the  cause is "+e.getCause() );
+
 
                 Toast.makeText(getApplicationContext(),"Something went wrong and we couldn't sign you up",Toast.LENGTH_LONG).show();
+
+                try {
+                    throw e;
+                }
+                catch (Exception ee){
+                    Log.v("ConnectivityFireBase",e.getMessage() +" the  cause is "+ee.getCause() );
+                }
             }
         });
 
@@ -165,6 +172,16 @@ public class FinishSignUpActivity extends AppCompatActivity {
                     Log.v("ConnectivityFireBase", "Something went wrong we couldn't Uploading Profile image" + "onComplete callback Push Image" + task.getException().getMessage());
                     somethingWentWrongPleaseTryAgainImageProblem(imageReferenceInStorage,imageToPush);
 
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                try {
+                    throw e;
+                }
+                catch (Exception ee){
+                    Log.v("ConnectivityFireBase", "Something went wrong we couldn't Uploading Profile image" + "onComplete callback Push Image" + ee.getMessage());
                 }
             }
         });
@@ -222,7 +239,13 @@ public class FinishSignUpActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Toast.makeText(getApplicationContext(), "Something went wrong we couldn't Finish SignUp", Toast.LENGTH_LONG).show();
-                Log.v("ConnectivityFireBase", "Something went wrong we couldn't Finish SignUp" + "onComplete callback addFullProfileToDataBase" + e.getMessage());
+
+                try {
+                    throw e;
+                }
+                catch(Exception ee){
+                    Log.v("ConnectivityFireBase", "Something went wrong we couldn't Finish SignUp" + "onComplete callback addFullProfileToDataBase" + ee.getMessage());
+                }
             }
         });
     }

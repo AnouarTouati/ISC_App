@@ -217,7 +217,13 @@ public class CreatePostActivity extends AppCompatActivity {
                 public void onFailure(@NonNull Exception e) {
                     progressDialog.dismiss();
                     Toast.makeText(getApplicationContext(), "Something went wrong we couldn't post", Toast.LENGTH_LONG).show();
-                    Log.v("ConnectivityFireBase", "Something went wrong we couldn't post" + "Post Data" + e.getMessage());
+
+                    try{
+                        throw  e;
+                    }
+                    catch (Exception ee){
+                        Log.v("ConnectivityFireBase", "Something went wrong we couldn't post" + "Post Data" + ee.getMessage());
+                    }
                 }
             });
         }
@@ -249,7 +255,27 @@ public class CreatePostActivity extends AppCompatActivity {
                             goBackToCoreActivity();
                         }
                     }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        try{
+                            throw  e;
+                        }
+                         catch (Exception ee){
+                            Log.v("ConnectivityFireBase", "Failed to send Notification"+ ee.toString());
+                        }
+                    }
                 });
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                try{
+                    throw  e;
+                }
+                catch (Exception ee){
+                    Log.v("ConnectivityFireBase", "Failed to create Notification"+ ee.toString());
+                }
             }
         });
 
@@ -282,11 +308,15 @@ public class CreatePostActivity extends AppCompatActivity {
             public void onFailure(@NonNull Exception e) {
                 progressDialog.dismiss();
                 Toast.makeText(getApplicationContext(), "Something went wrong we couldn't post", Toast.LENGTH_LONG).show();
-                if (e instanceof StorageException) {
-                    StorageException ee = (StorageException) e;
-                    Log.v("ConnectivityFireBase", "Something went wrong we couldn't post" + "onFailure callback Push Image" + "Error code" + ee.getErrorCode() + " http code" + ee.getHttpResultCode() + " cause" + ee.getCause());
-                } else {
-                    Log.v("ConnectivityFireBase", "Something went wrong we couldn't post" + "onFailure callback Push Image" + e.toString());
+                try{
+                    throw e;
+                }
+               catch(StorageException eee) {
+
+                    Log.v("ConnectivityFireBase", "Something went wrong we couldn't post" + "onFailure callback Push Image" + "Error code" + eee.getErrorCode() + " http code" + eee.getHttpResultCode() + " cause" + eee.getCause());
+                }
+                catch (Exception ee){
+                    Log.v("ConnectivityFireBase", "Something went wrong we couldn't post" + "onFailure callback Push Image" + ee.toString());
                 }
 
             }
@@ -297,7 +327,17 @@ public class CreatePostActivity extends AppCompatActivity {
     private void deletePostPushImageWasNotSuccessful(String postID) {
         FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        firebaseFirestore.collection("AllPosts").document(Objects.requireNonNull(firebaseUser).getUid()).collection("userPosts").document(postID).delete();
+        firebaseFirestore.collection("AllPosts").document(Objects.requireNonNull(firebaseUser).getUid()).collection("userPosts").document(postID).delete().addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                try{
+                    throw e;
+                }
+                catch (Exception ee){
+                    Log.v("ConnectivityFireBase", "Failed to delete Post after image uploading failure" + ee.getMessage());
+                }
+            }
+        });
     }
 
     @Override

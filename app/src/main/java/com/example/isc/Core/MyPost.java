@@ -6,11 +6,12 @@ public class MyPost {
 
     private String postedText, myPostLevel, myPostTagColleague, myPostEvents;
     private Bitmap postedImageBitmap;
+    private boolean hasImage;
     private MyUser myUser;
     private String postID;
    private int indexOfPostForThisUser;//cause we might have multiple post by a single user
 
-    public MyPost(String postID,MyUser myUser,int indexOfPostForThisUser, String postedText, Bitmap postedImageBitmap,
+    public MyPost(String postID,MyUser myUser,int indexOfPostForThisUser, String postedText,boolean hasImage ,Bitmap postedImageBitmap,
                   String myPostLevel, String myPostTagColleague, String myPostEvents){
        this.postID=postID;
        this.postedText = postedText;
@@ -20,6 +21,7 @@ public class MyPost {
         this.myPostTagColleague = myPostTagColleague;
         this.myPostEvents = myPostEvents;
         this.indexOfPostForThisUser=indexOfPostForThisUser;
+        this.hasImage=hasImage;
     }
 
     public String getMyPostEvents() {
@@ -73,4 +75,6 @@ public class MyPost {
     public int getIndexOfPostForThisUser(){
         return indexOfPostForThisUser;
     }
+
+    public boolean hasImage(){return hasImage;}
 }

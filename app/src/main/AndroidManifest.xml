@@ -3,6 +3,7 @@
     package="com.example.isc">
 
     <application
+
         android:allowBackup="true"
         android:hardwareAccelerated="false"
         android:icon="@mipmap/ic_launcher"

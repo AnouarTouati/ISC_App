@@ -100,10 +100,11 @@
         android:textSize="14sp"/>
     <ImageView
         android:id="@+id/postedImage"
-        android:src="@drawable/img1"
+        android:src="@drawable/post_image_placeholder"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"
         android:maxHeight="200dp"/>
+
 </LinearLayout>

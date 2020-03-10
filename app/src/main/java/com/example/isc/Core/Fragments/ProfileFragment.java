@@ -31,6 +31,7 @@ import com.example.isc.Core.MyUser;
 import com.example.isc.Core.NonScrollListView;
 import com.example.isc.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -227,6 +228,16 @@ public class ProfileFragment extends Fragment {
                    myUser0.setPosition(newClubPosition);
                }
             }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                try{
+                    throw e;
+                }
+                catch (Exception ee){
+                    Log.v("ConnectivityFireBase", "Something went wrong and we couldn't Update position" + ee.getMessage());
+                }
+            }
         });
     }
     private void getUserProfile(){
@@ -252,6 +263,16 @@ public class ProfileFragment extends Fragment {
                  Log.v("ConnectivityFireBase", "Error receiving profile " + task.getException());
              }
          }
+     }).addOnFailureListener(new OnFailureListener() {
+         @Override
+         public void onFailure(@NonNull Exception e) {
+             try{
+                 throw e;
+             }
+             catch (Exception ee){
+                 Log.v("ConnectivityFireBase", "Something went wrong and we couldn't get user profile" + ee.getMessage());
+             }
+         }
      });
 
 
@@ -270,12 +291,12 @@ public class ProfileFragment extends Fragment {
                         String events = Objects.requireNonNull(snapshots.get(i).get("events")).toString();
                         String postID= Objects.requireNonNull(snapshots.get(i).get("postID")).toString();
                         if(!snapshots.get(i).get("imageReferenceInStorage").toString().equals("")){
-                            Bitmap placeHolderImage = BitmapFactory.decodeResource(getResources(), R.drawable.post_image_placeholder);
-                            postArrayList.add(new MyPost(postID,myUser0, i/*this i here is useless we just use it for home*/,cpText, placeHolderImage, checkedDepartments, colleagues, events));
+
+                            postArrayList.add(new MyPost(postID,myUser0, i/*this i here is useless we just use it for home*/,cpText, true,null, checkedDepartments, colleagues, events));
                             String imageReferenceInStorage=snapshots.get(i).get("imageReferenceInStorage").toString();
                             getImageFromServer(imageReferenceInStorage,postArrayList.size()-1/*aka index where the image should be placed*/);
                         }else{
-                            postArrayList.add(new MyPost(postID,myUser0, i/*this i here is useless we just use it for home*/,cpText, null, checkedDepartments, colleagues, events));
+                            postArrayList.add(new MyPost(postID,myUser0, i/*this i here is useless we just use it for home*/,cpText, false,null, checkedDepartments, colleagues, events));
                         }
 
 
@@ -284,6 +305,16 @@ public class ProfileFragment extends Fragment {
                 } else {
                     Log.v("ConnectivityFireBase", "Error receiving posts " + task.getException());
 
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                try{
+                    throw e;
+                }
+                catch (Exception ee){
+                    Log.v("ConnectivityFireBase", "Something went wrong and we couldn't get images" + ee.getMessage());
                 }
             }
         });
@@ -323,6 +354,16 @@ public class ProfileFragment extends Fragment {
 
                        } else {
                            Log.d("ConnectivityFireBase", "Something went wrong and we couldn't get images " + Objects.requireNonNull(task.getException()).toString());
+                       }
+                   }
+               }).addOnFailureListener(new OnFailureListener() {
+                   @Override
+                   public void onFailure(@NonNull Exception e) {
+                       try{
+                           throw e;
+                       }
+                       catch (Exception ee){
+                           Log.v("ConnectivityFireBase", "Something went wrong and we couldn't get images" + ee.getMessage());
                        }
                    }
                });
@@ -383,6 +424,16 @@ public class ProfileFragment extends Fragment {
                 postArrayList.remove(postPosition);
                 dataUpdatedNotifyListView();
             }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                try{
+                    throw e;
+                }
+                catch (Exception ee){
+                    Log.v("ConnectivityFireBase", "Something went wrong we couldn't Delete the post" + ee.getMessage());
+                }
+            }
         });
     }
 
@@ -420,6 +471,16 @@ public class ProfileFragment extends Fragment {
             public void onComplete(@NonNull Task<Void> task) {
                 getUserProfile();
             }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                try{
+                    throw e;
+                }
+                catch (Exception ee){
+                    Log.v("ConnectivityFireBase", "Something went wrong we couldn't Update Profile name" + ee.getMessage());
+                }
+            }
         });
 
     }
@@ -448,6 +509,16 @@ public class ProfileFragment extends Fragment {
                         Log.v("ConnectivityFireBase", "Something went wrong we couldn't Update Profile image" + "onComplete callback Update Profile Image" + task.getException().getMessage());
                         somethingWentWrongPleaseTryAgainImageProblem(imageToPush);
 
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    try{
+                        throw e;
+                    }
+                    catch (Exception ee){
+                        Log.v("ConnectivityFireBase", "Something went wrong we couldn't Update Profile image" + "onComplete callback Update Profile Image" + ee.getMessage());
                     }
                 }
             });
