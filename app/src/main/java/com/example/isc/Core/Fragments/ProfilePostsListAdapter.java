@@ -65,7 +65,7 @@ public class ProfilePostsListAdapter extends ArrayAdapter<MyPost> {
                 holder.posterName.setText(post.getMyUser().getFullName());
             }
             if (posterPosition != null) {
-                holder.posterPosition.setText(post.getMyUser().getPosition());
+                holder.posterPosition.setText(post.getMyUser().getPositionAsString());
             }
             if (postedText != null) {
                 if(post.getPostedText().length()>100){

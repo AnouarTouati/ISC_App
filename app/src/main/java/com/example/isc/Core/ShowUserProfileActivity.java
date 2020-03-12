@@ -28,7 +28,7 @@ public class ShowUserProfileActivity extends AppCompatActivity {
 
     private   NonScrollListView userPostsListView;
     private   ShowUserProfilePostsListAdapter adapter;
-    private   ArrayList<MyPost> postArrayList;
+    private   ArrayList<MyPost> postArrayList=new ArrayList<>();
 
     Boolean userPostIsVisible = false;
 

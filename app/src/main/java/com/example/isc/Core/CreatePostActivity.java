@@ -28,6 +28,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
+import com.example.isc.Common;
 import com.example.isc.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -285,7 +286,7 @@ public class CreatePostActivity extends AppCompatActivity {
         StorageReference imageReference = firebaseStorage.getReference();
         imageReference = imageReference.child(imageReferenceInStorage);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        imageToPush.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+        imageToPush.compress(Bitmap.CompressFormat.JPEG, Common.IMAGE_QUALITY, byteArrayOutputStream);
         byte[] imageInBytes = byteArrayOutputStream.toByteArray();
         UploadTask uploadImageTask = imageReference.putBytes(imageInBytes);
         uploadImageTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {

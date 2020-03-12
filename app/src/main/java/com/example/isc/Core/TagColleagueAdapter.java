@@ -53,7 +53,7 @@ public class TagColleagueAdapter extends ArrayAdapter<MyUser> {
 
         if(myColleague != null) {
             holder.colleagueName.setText(myColleague.getFullName());
-            holder.colleaguePosition.setText(myColleague.getPosition());
+            holder.colleaguePosition.setText(myColleague.getPositionAsString());
             holder.colleagueProfileImage.setImageBitmap(myColleague.getProfileImageBitmap());
         }
 

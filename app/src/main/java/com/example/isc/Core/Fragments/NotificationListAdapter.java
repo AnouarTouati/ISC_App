@@ -46,23 +46,26 @@ public class NotificationListAdapter extends ArrayAdapter<MyNotification> {
         myNotification = getItem(position);
 
         if (myNotification != null) {
-
+            if(myNotification.getMyUser()!=null){
             if (notificationProfileImage != null) {
-                holder.notificationProfileImage.setImageBitmap(myNotification.getMyUser().getProfileImageBitmap());
-                holder.notificationProfileImage.setDrawingCacheEnabled(true);
+
+                    holder.notificationProfileImage.setImageBitmap(myNotification.getMyUser().getProfileImageBitmap());
+                    holder.notificationProfileImage.setDrawingCacheEnabled(true);
+
             }
             if (notificationTextView != null) {
                 holder.notificationTextView.setText(
                         Html.fromHtml("<b>"+
                                 myNotification.getMyUser().getFullName()+"</b>" + " " +
                         "<font color=\"#555555\">"+
-                                myNotification.getMyUser().getPosition()+"</font>"+ " " +
+                                myNotification.getMyUser().getPositionAsString()+"</font>"+ " " +
                         "<font color=\"#000000\">"+
                                 myNotification.getNotificationText()+"</font>"));
             }
             if (notificationTime != null) {
                 holder.notificationTime.setText(myNotification.getNotificationTime());
             }
+        }
         }
         return v;
     }

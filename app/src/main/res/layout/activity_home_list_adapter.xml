@@ -96,5 +96,5 @@
         android:scaleType="fitCenter"
         android:maxHeight="200dp"
         />
-    
+
 </LinearLayout>

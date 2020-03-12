@@ -30,7 +30,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class NotificationFragment extends Fragment {
 
@@ -38,13 +40,17 @@ public class NotificationFragment extends Fragment {
     private ListView notificationListView;
     private NotificationListAdapter notificationListAdapter;
     private ArrayList<MyNotification> notificationArrayList=new ArrayList<>();
-
+    private ArrayList<MyUser> allUsersProfiles = new ArrayList<>();
+    private Map<String,ArrayList<Integer>> userProfileIDsWeAlreadyRequestedAndTheRequestingNotificationsIndexes=new HashMap<>();
     private FirebaseFirestore firebaseFirestore;
     private FirebaseStorage firebaseStorage;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View fragmentView = inflater.inflate(R.layout.fragment_notification, container, false);
+
+        notificationArrayList.clear();
+        allUsersProfiles.clear();
 
         firebaseFirestore=FirebaseFirestore.getInstance();
         firebaseStorage=FirebaseStorage.getInstance();
@@ -60,11 +66,11 @@ public class NotificationFragment extends Fragment {
             }
         });
         listenToNotificationFromFirestore();
+        Log.v("AppLogic","OnCreateCalled");
         return fragmentView;
     }
 
-
-  private  void listenToNotificationFromFirestore(){
+    private  void listenToNotificationFromFirestore(){
 
      firebaseFirestore.collection("Notifications").orderBy("notificationTimeInMillis", Query.Direction.DESCENDING).addSnapshotListener(new EventListener<QuerySnapshot>() {
          @Override
@@ -75,21 +81,54 @@ public class NotificationFragment extends Fragment {
                      String userID=notificationSnaps.get(i).get("userID").toString();
                      String notificationText=notificationSnaps.get(i).get("notificationText").toString();
                      String notificationTime=notificationSnaps.get(i).get("notificationTime").toString();
+                     //we must add it first so we dont loose track of where this notification is//if we dont it will get messy trust me
+                     MyNotification aNotification=new MyNotification(null,notificationText,notificationTime);
+                     notificationArrayList.add(aNotification);
                      getUserProfileAndAddNotification(userID,notificationText,notificationTime,i);
                  }
          }
      });
     }
-  void getUserProfileAndAddNotification(final String userID, final String notificationText, final String notificationTime, final int arrayListIndex){
+  void getUserProfileAndAddNotification(final String userID, final String notificationText, final String notificationTime, final int theIndexOfNotificationThatRequestedThisProfile){
+
+      boolean weAlreadyHaveThatProfile=false;
+      for(int i=0;i<allUsersProfiles.size();i++){
+          if(allUsersProfiles.get(i).getUserID().equals(userID)){
+              weAlreadyHaveThatProfile=true;
+              notificationArrayList.get(theIndexOfNotificationThatRequestedThisProfile).setMyUser(allUsersProfiles.get(i));
+              dataUpdatedNotifyListView();
+              break;
+          }
+      }
+    boolean haveWeRequestedThatProfileYet=false;
+  /*   for(int i=0;i<userProfileIDsWeAlreadyRequested.size();i++){
+        if(userProfileIDsWeAlreadyRequested.get(i).equals(userID)){
+            haveWeRequestedThatProfileYet=true;
+            break;
+        }
+      }*/
+          if(userProfileIDsWeAlreadyRequestedAndTheRequestingNotificationsIndexes.containsKey(userID)){
+              haveWeRequestedThatProfileYet=true;
+              userProfileIDsWeAlreadyRequestedAndTheRequestingNotificationsIndexes.get(userID).add(theIndexOfNotificationThatRequestedThisProfile);
+      }
+      if(!weAlreadyHaveThatProfile && !haveWeRequestedThatProfileYet){
+
+         ArrayList<Integer> notificationArrayListInitialize=new ArrayList<>();
+         notificationArrayListInitialize.add(theIndexOfNotificationThatRequestedThisProfile);
+        userProfileIDsWeAlreadyRequestedAndTheRequestingNotificationsIndexes.put(userID,notificationArrayListInitialize);
         firebaseFirestore.collection("Profiles").document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
            if (task.isSuccessful()){
+
                MyUser user= new MyUser(userID,null, (String) task.getResult().get("name"), task.getResult().getLong("position").intValue());
-               MyNotification notification=new MyNotification(user,notificationText,notificationTime);
-               notificationArrayList.add(notification);
+               allUsersProfiles.add(user);//whenever we need to assign a user we must use this array to keep the refrence so that when we update the image it changes all over the place
+               for(int i=0;i<userProfileIDsWeAlreadyRequestedAndTheRequestingNotificationsIndexes.get(userID).size();i++){
+                   notificationArrayList.get(userProfileIDsWeAlreadyRequestedAndTheRequestingNotificationsIndexes.get(userID).get(i)).setMyUser(allUsersProfiles.get(allUsersProfiles.size()-1));
+               }
+               getUserProfileImage(task.getResult().get("profileImageReferenceInStorage").toString()/*,userProfileIDsWeAlreadyRequestedAndTheRequestingNotificationsIndexes.get(userID).get(i)*/,allUsersProfiles.size()-1);
                dataUpdatedNotifyListView();
-               getUserProfileImage(task.getResult().get("profileImageReferenceInStorage").toString(),arrayListIndex);
+
             }
         }}).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -102,8 +141,9 @@ public class NotificationFragment extends Fragment {
                 }
             }
         });
+      }
   }
-  void getUserProfileImage(String storageReferencePath, final int arrayListIndex){
+  void getUserProfileImage(String storageReferencePath /*,final int theIndexOfNotificationThatRequestedThisProfile*/, final int profileIndex){
         //if we don't have a valid path to storage we don't do anything since the Notification is there no exception will occur
         if(storageReferencePath!=null){
             if(!storageReferencePath.equals("")) {
@@ -114,11 +154,9 @@ public class NotificationFragment extends Fragment {
                     @Override
                     public void onComplete(@NonNull Task<byte[]> task) {
                         if(task.isSuccessful()){
-
-                                MyNotification aNotification =notificationArrayList.get(arrayListIndex);
-                                aNotification.getMyUser().setProfileImageBitmap(BitmapFactory.decodeByteArray(task.getResult().clone(),0,task.getResult().length));
-                                notificationArrayList.remove(arrayListIndex);
-                                notificationArrayList.add(arrayListIndex,aNotification);
+                               allUsersProfiles.get(profileIndex).setProfileImageBitmap(BitmapFactory.decodeByteArray(task.getResult().clone(),0,task.getResult().length));
+                        //        MyNotification aNotification =notificationArrayList.get(theIndexOfNotificationThatRequestedThisProfile);
+                        //        aNotification.setMyUser(allUsersProfiles.get(profileIndex));
                                 dataUpdatedNotifyListView();
                             }
 
