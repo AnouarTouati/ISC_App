@@ -1,5 +1,11 @@
 package com.example.isc;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
+
+import java.io.ByteArrayOutputStream;
+
 public class Common {
     public static final int KILL_ACTIVITY_REG=12;
     public static final int ONE_MEGA_BYTE = 1024 * 1024;
@@ -15,5 +21,19 @@ public class Common {
            }
        }
        return -1;
+    }
+
+   public static String convertBitmapToString(Bitmap image){
+
+        ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.WEBP,85,byteArrayOutputStream);
+        return Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+    }
+
+   public static Bitmap convertStringToBitmap(String image) {
+
+        byte[] bytes;
+        bytes = Base64.decode(image, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 }

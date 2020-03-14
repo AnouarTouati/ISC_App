@@ -3,6 +3,7 @@ package com.example.isc.Entry;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.KeyEvent;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,7 +26,7 @@ public class EntryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_entry);
-
+   try{
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             finish();
             startActivity(new Intent(getApplicationContext(), CoreActivity.class));
@@ -53,7 +54,12 @@ public class EntryActivity extends AppCompatActivity {
                     }
                 }, 3000);
             }
-        }
+        }}catch (Exception e){
+       Log.v("AppLogic","Something went wrong "
+               +"the cause: " +e.getCause()
+               + "the message: "+e.getMessage()
+       );
+   }
 
     }
 

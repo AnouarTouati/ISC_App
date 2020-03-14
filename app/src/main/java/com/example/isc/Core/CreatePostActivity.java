@@ -78,93 +78,98 @@ public class CreatePostActivity extends AppCompatActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_post);
-
-        scrollView=findViewById(R.id.createPostScrollView);
-        viewPagerAdapter=new CreatePostViewPagerAdapter(getSupportFragmentManager());
-        viewPagerAdapter.addFragment(new IncludeEventActivity());
-        viewPagerAdapter.addFragment(new TagColleagueActivity());
-        viewPagerAdapter.addFragment(new PostLevelActivity());
-        viewPager=findViewById(R.id.createPostViewPager);
-        viewPager.setAdapter(viewPagerAdapter);
-
-
-        firebaseFirestore = FirebaseFirestore.getInstance();
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-
-        progressDialog = new ProgressDialog(this);
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(
-                Html.fromHtml("<font color=\"#1976D2\"> Create post </font>")
-        );
-        getSupportActionBar().setDisplayShowTitleEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_24dp);
+try {
+    scrollView = findViewById(R.id.createPostScrollView);
+    viewPagerAdapter = new CreatePostViewPagerAdapter(getSupportFragmentManager());
+    viewPagerAdapter.addFragment(new IncludeEventActivity());
+    viewPagerAdapter.addFragment(new TagColleagueActivity());
+    viewPagerAdapter.addFragment(new PostLevelActivity());
+    viewPager = findViewById(R.id.createPostViewPager);
+    viewPager.setAdapter(viewPagerAdapter);
 
 
-        eventsTextView = findViewById(R.id.eventsTextView);
-        eventsTextView.setText(events);
+    firebaseFirestore = FirebaseFirestore.getInstance();
+    firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        postButton = findViewById(R.id.postButton);
-        postButton.setTextColor(Color.GRAY);
+    progressDialog = new ProgressDialog(this);
+    Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+    getSupportActionBar().setTitle(
+            Html.fromHtml("<font color=\"#1976D2\"> Create post </font>")
+    );
+    getSupportActionBar().setDisplayShowTitleEnabled(true);
+    getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_24dp);
 
-        cpImage = findViewById(R.id.cpImage);
 
-        showPostLevelImageButton = findViewById(R.id.showPostLevelImageButton);
+    eventsTextView = findViewById(R.id.eventsTextView);
+    eventsTextView.setText(events);
 
-        cpEditText = findViewById(R.id.cpEditText);
-        cpEditText.setText(textToPost);
-        cpEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
+    postButton = findViewById(R.id.postButton);
+    postButton.setTextColor(Color.GRAY);
+
+    cpImage = findViewById(R.id.cpImage);
+
+    showPostLevelImageButton = findViewById(R.id.showPostLevelImageButton);
+
+    cpEditText = findViewById(R.id.cpEditText);
+    cpEditText.setText(textToPost);
+    cpEditText.addTextChangedListener(new TextWatcher() {
+        @Override
+        public void afterTextChanged(Editable s) {
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            if (s.length() == 0) {
+                postButton.setTextColor(Color.GRAY);
+            } else {
+                postButton.setTextColor(Color.BLACK);
             }
+            textToPost = s.toString();
+        }
+    });
 
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+    createPostLL = findViewById(R.id.createPostLL);
+    optionsLL = findViewById(R.id.optionsLinearLayout);
+    photoLL = findViewById(R.id.photoLinearLayout);
+    photoLLTextView = findViewById(R.id.photoLLTextView);
+    includeEventLL = findViewById(R.id.includeEventLinearLayout);
+    tagColleagueLL = findViewById(R.id.tagColleagueLinearLayout);
+    specifyDepartmentLL = findViewById(R.id.specifyDepartmentLinearLayout);
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() == 0) {
-                    postButton.setTextColor(Color.GRAY);
-                } else {
-                    postButton.setTextColor(Color.BLACK);
-                }
-                textToPost = s.toString();
-            }
-        });
-
-        createPostLL = findViewById(R.id.createPostLL);
-        optionsLL = findViewById(R.id.optionsLinearLayout);
-        photoLL = findViewById(R.id.photoLinearLayout);
-        photoLLTextView = findViewById(R.id.photoLLTextView);
-        includeEventLL = findViewById(R.id.includeEventLinearLayout);
-        tagColleagueLL = findViewById(R.id.tagColleagueLinearLayout);
-        specifyDepartmentLL = findViewById(R.id.specifyDepartmentLinearLayout);
-
-        photoLL.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                selectImage();
-            }
-        });
-        includeEventLL.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                includeEvent();
-            }
-        });
-        tagColleagueLL.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                tagColleague();
-            }
-        });
-        specifyDepartmentLL.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                specifyDepartment();
-            }
-        });
-
+    photoLL.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            selectImage();
+        }
+    });
+    includeEventLL.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            includeEvent();
+        }
+    });
+    tagColleagueLL.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            tagColleague();
+        }
+    });
+    specifyDepartmentLL.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            specifyDepartment();
+        }
+    });
+}catch (Exception e){
+    Log.v("AppLogic","Something went wrong "
+            +"the cause: " +e.getCause()
+            + "the message: "+e.getMessage()
+    );
+}
 
     }
 

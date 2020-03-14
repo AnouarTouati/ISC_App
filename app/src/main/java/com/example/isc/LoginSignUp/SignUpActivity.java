@@ -36,7 +36,7 @@ public class SignUpActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
-
+      try{
         Objects.requireNonNull(getSupportActionBar()).hide();
 
         firebaseAuth = FirebaseAuth.getInstance();
@@ -53,6 +53,12 @@ public class SignUpActivity extends AppCompatActivity {
         signUpConfirmPassword = findViewById(R.id.signUpConfirmPassword);
 
         progressDialog = new ProgressDialog(this);
+      } catch (Exception e){
+          Log.v("AppLogic","Something went wrong "
+                  +"the cause: " +e.getCause()
+                  + "the message: "+e.getMessage()
+          );
+      }
 
     }
 

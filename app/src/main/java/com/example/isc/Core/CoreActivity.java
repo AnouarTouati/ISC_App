@@ -2,6 +2,7 @@ package com.example.isc.Core;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,76 +27,81 @@ public class CoreActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_core);
-
-        homeTabItem = findViewById(R.id.homeTabItem);
-        notificationTabItem = findViewById(R.id.notificationTabItem);
-        profileTabItem = findViewById(R.id.profileTabItem);
-
-        tabLayout = findViewById(R.id.coreActivityTabLayout);
-        viewPager = findViewById(R.id.coreActivityViewPager);
-
-        CreatePostViewPagerAdapter pagerAdapter = new CreatePostViewPagerAdapter(getSupportFragmentManager());
-        pagerAdapter.addFragment(new HomeFragment());
-        pagerAdapter.addFragment(new NotificationFragment());
-        pagerAdapter.addFragment(new ProfileFragment());
-
-        viewPager.setAdapter(pagerAdapter);
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int i, float v, int i1) {
-
-            }
-
-            @Override
-            public void onPageSelected(int i) {
-
-                Objects.requireNonNull(tabLayout.getTabAt(i)).select();
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int i) {
-
-            }
-        });
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                viewPager.setCurrentItem(tab.getPosition());
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
-        });
-
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.img0_vector);
-
-        Intent intent = getIntent();
         try {
-            switch (Objects.requireNonNull(intent.getStringExtra("to"))) {
-                case "notification":
-                    setNotification();
-                    break;
-                case "profile":
-                    setProfile();
-                    break;
-                default:
-                    setHome();
+            homeTabItem = findViewById(R.id.homeTabItem);
+            notificationTabItem = findViewById(R.id.notificationTabItem);
+            profileTabItem = findViewById(R.id.profileTabItem);
+
+            tabLayout = findViewById(R.id.coreActivityTabLayout);
+            viewPager = findViewById(R.id.coreActivityViewPager);
+
+            CreatePostViewPagerAdapter pagerAdapter = new CreatePostViewPagerAdapter(getSupportFragmentManager());
+            pagerAdapter.addFragment(new HomeFragment());
+            pagerAdapter.addFragment(new NotificationFragment());
+            pagerAdapter.addFragment(new ProfileFragment());
+
+            viewPager.setAdapter(pagerAdapter);
+            viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageScrolled(int i, float v, int i1) {
+
+                }
+
+                @Override
+                public void onPageSelected(int i) {
+
+                    Objects.requireNonNull(tabLayout.getTabAt(i)).select();
+
+                }
+
+                @Override
+                public void onPageScrollStateChanged(int i) {
+
+                }
+            });
+            tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+                @Override
+                public void onTabSelected(TabLayout.Tab tab) {
+                    viewPager.setCurrentItem(tab.getPosition());
+                }
+
+                @Override
+                public void onTabUnselected(TabLayout.Tab tab) {
+
+                }
+
+                @Override
+                public void onTabReselected(TabLayout.Tab tab) {
+
+                }
+            });
+
+            Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+            Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.img0_vector);
+
+            Intent intent = getIntent();
+            try {
+                switch (Objects.requireNonNull(intent.getStringExtra("to"))) {
+                    case "notification":
+                        setNotification();
+                        break;
+                    case "profile":
+                        setProfile();
+                        break;
+                    default:
+                        setHome();
+                }
+            } catch (NullPointerException e) {
+                setHome();
             }
-        } catch (NullPointerException e) {
-            setHome();
+        }catch (Exception e){
+            Log.v("AppLogic","Something went wrong "
+           +"the cause: " +e.getCause()
+           + "the message: "+e.getMessage()
+            );
         }
+
     }
-
-
     @Override
     public void onBackPressed() {
         moveTaskToBack(true);

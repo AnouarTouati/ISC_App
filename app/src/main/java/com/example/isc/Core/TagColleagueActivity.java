@@ -45,9 +45,9 @@ public class TagColleagueActivity extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view=inflater.inflate(R.layout.activity_tag_colleague,container,false);
-
-        firebaseFirestore = FirebaseFirestore.getInstance();
-        firebaseStorage = FirebaseStorage.getInstance();
+      try {
+          firebaseFirestore = FirebaseFirestore.getInstance();
+          firebaseStorage = FirebaseStorage.getInstance();
 
 
       /*  taggedColleagues = new ArrayList<>();
@@ -60,47 +60,52 @@ public class TagColleagueActivity extends Fragment {
             add(new MyUser("Garbage",null, "Nedjem Eddine", "Head"));
             add(new MyUser("Garbage",null, "Saad Eddine", "Member"));
         }};*/
-        tagColleagueAdapter = new TagColleagueAdapter(Objects.requireNonNull(getActivity()).getApplicationContext(), R.layout.activity_tag_colleague_list_adapter, colleagues);
-        colleagueListView = view.findViewById(R.id.colleagueListView);
-        colleagueListView.setAdapter(tagColleagueAdapter);
+          tagColleagueAdapter = new TagColleagueAdapter(Objects.requireNonNull(getActivity()).getApplicationContext(), R.layout.activity_tag_colleague_list_adapter, colleagues);
+          colleagueListView = view.findViewById(R.id.colleagueListView);
+          colleagueListView.setAdapter(tagColleagueAdapter);
 
-        tagColleagueButton = view.findViewById(R.id.tagColleagueButton);
-        tagColleagueButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                StringBuilder tagColleague = new StringBuilder();
-                for(int i=0; i<taggedColleagues.size(); i++){
-                    tagColleague.append("@");
-                    tagColleague.append(taggedColleagues.get(i));
-                    tagColleague.append("\n");
-                }
-                if(getActivity()!=null){
-                    if(getActivity() instanceof  CreatePostActivity){
-                        ((CreatePostActivity)getActivity()).colleagues=tagColleague.toString();
-                        ((CreatePostActivity)getActivity()).returnViewToTheParentActivity();
-                    }
-                    else  if (getActivity() instanceof EditPostActivity){
-                        ((EditPostActivity)getActivity()).epColleagues=tagColleague.toString();
-                        ((EditPostActivity)getActivity()).returnViewToTheParentActivity();
-                    }
-                }
+          tagColleagueButton = view.findViewById(R.id.tagColleagueButton);
+          tagColleagueButton.setOnClickListener(new View.OnClickListener() {
+              @Override
+              public void onClick(View v) {
+                  StringBuilder tagColleague = new StringBuilder();
+                  for (int i = 0; i < taggedColleagues.size(); i++) {
+                      tagColleague.append("@");
+                      tagColleague.append(taggedColleagues.get(i));
+                      tagColleague.append("\n");
+                  }
+                  if (getActivity() != null) {
+                      if (getActivity() instanceof CreatePostActivity) {
+                          ((CreatePostActivity) getActivity()).colleagues = tagColleague.toString();
+                          ((CreatePostActivity) getActivity()).returnViewToTheParentActivity();
+                      } else if (getActivity() instanceof EditPostActivity) {
+                          ((EditPostActivity) getActivity()).epColleagues = tagColleague.toString();
+                          ((EditPostActivity) getActivity()).returnViewToTheParentActivity();
+                      }
+                  }
 
-            }
-        });
-        searchColleague =view.findViewById(R.id.searchColleague);
-        searchColleague.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
+              }
+          });
+          searchColleague = view.findViewById(R.id.searchColleague);
+          searchColleague.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+              @Override
+              public boolean onQueryTextSubmit(String query) {
+                  return false;
+              }
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                tagColleagueAdapter.filter(newText);
-                return true;
-            }
-        });
-        getAllUsersProfiles();
+              @Override
+              public boolean onQueryTextChange(String newText) {
+                  tagColleagueAdapter.filter(newText);
+                  return true;
+              }
+          });
+          getAllUsersProfiles();
+      }catch (Exception e){
+          Log.v("AppLogic","Something went wrong "
+                  +"the cause: " +e.getCause()
+                  + "the message: "+e.getMessage()
+          );
+      }
         return view;
     }
     private void getAllUsersProfiles() {
@@ -111,7 +116,7 @@ public class TagColleagueActivity extends Fragment {
                     colleagues.clear();
                     List<DocumentSnapshot> allProfiles = Objects.requireNonNull(task.getResult()).getDocuments();
                     for (int i = 0; i < allProfiles.size(); i++) {
-                        MyUser user = new MyUser(allProfiles.get(i).getId(), null, Objects.requireNonNull(allProfiles.get(i).get("name")).toString(), Objects.requireNonNull(allProfiles.get(i).getLong("position")).intValue());
+                        MyUser user = new MyUser(allProfiles.get(i).getId(), null, Objects.requireNonNull(allProfiles.get(i).get("name")).toString(), Objects.requireNonNull(allProfiles.get(i).getLong("position")).intValue(),allProfiles.get(i).getString("email"));
                         colleagues.add(user);
                         //we check for valid reference inside getImageFromServer method
                         getUserProfileImage(Objects.requireNonNull(allProfiles.get(i).get("profileImageReferenceInStorage")).toString(), i);

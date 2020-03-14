@@ -121,7 +121,7 @@ public class NotificationFragment extends Fragment {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
            if (task.isSuccessful()){
 
-               MyUser user= new MyUser(userID,null, (String) task.getResult().get("name"), task.getResult().getLong("position").intValue());
+               MyUser user= new MyUser(userID,null, (String) task.getResult().get("name"), task.getResult().getLong("position").intValue(),task.getResult().getString("email"));
                allUsersProfiles.add(user);//whenever we need to assign a user we must use this array to keep the refrence so that when we update the image it changes all over the place
                for(int i=0;i<userProfileIDsWeAlreadyRequestedAndTheRequestingNotificationsIndexes.get(userID).size();i++){
                    notificationArrayList.get(userProfileIDsWeAlreadyRequestedAndTheRequestingNotificationsIndexes.get(userID).get(i)).setMyUser(allUsersProfiles.get(allUsersProfiles.size()-1));

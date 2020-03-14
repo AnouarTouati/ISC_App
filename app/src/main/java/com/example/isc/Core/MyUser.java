@@ -4,19 +4,22 @@ import android.graphics.Bitmap;
 
 import com.example.isc.Common;
 
-public class MyUser {
+public class MyUser  {
     private Bitmap profileImageBitmap;
     private String fullName, email, password;
     private int position;
     private long studentCardNumber;
     private final String userID;//final since id should not change
 
-    public MyUser(String userID,Bitmap profileImageBitmap, String fullName, int position){
+
+    public MyUser(String userID,Bitmap profileImageBitmap, String fullName, int position,String email){
         this.userID=userID;
         this.profileImageBitmap =profileImageBitmap;
         this.fullName = fullName;
         this.position = position;
+        this.email=email;
     }
+
 
     public Bitmap getProfileImageBitmap() {
         return profileImageBitmap;
@@ -43,4 +46,7 @@ public class MyUser {
     }
 
     public String getUserID(){return userID;}
+   public String getEmail(){return email;}
+
+
 }

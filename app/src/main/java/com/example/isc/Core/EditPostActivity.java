@@ -80,98 +80,102 @@ public class EditPostActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_post);
+        try {
+            viewPagerAdapter = new CreatePostViewPagerAdapter(getSupportFragmentManager());
+            viewPagerAdapter.addFragment(new IncludeEventActivity());
+            viewPagerAdapter.addFragment(new TagColleagueActivity());
+            viewPagerAdapter.addFragment(new PostLevelActivity());
+            viewPager = findViewById(R.id.editPostViewPager);
+            viewPager.setAdapter(viewPagerAdapter);
 
 
+            firebaseFirestore = FirebaseFirestore.getInstance();
+            firebaseStorage = FirebaseStorage.getInstance();
+            firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        viewPagerAdapter = new CreatePostViewPagerAdapter(getSupportFragmentManager());
-        viewPagerAdapter.addFragment(new IncludeEventActivity());
-        viewPagerAdapter.addFragment(new TagColleagueActivity());
-        viewPagerAdapter.addFragment(new PostLevelActivity());
-        viewPager=findViewById(R.id.editPostViewPager);
-        viewPager.setAdapter(viewPagerAdapter);
+            progressDialog = new ProgressDialog(this);
 
 
-        firebaseFirestore = FirebaseFirestore.getInstance();
-        firebaseStorage = FirebaseStorage.getInstance();
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+            Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle(
+                    Html.fromHtml("<font color=\"#1976D2\"> Edit post </font>")
+            );
+            getSupportActionBar().setDisplayShowTitleEnabled(true);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_24dp);
 
-        progressDialog = new ProgressDialog(this);
+            Intent intent = getIntent();
 
-
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(
-                Html.fromHtml("<font color=\"#1976D2\"> Edit post </font>")
-        );
-        getSupportActionBar().setDisplayShowTitleEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_24dp);
-
-        Intent intent = getIntent();
-
-        epEventsTextView = findViewById(R.id.epEventsTextView);
-        if (intent.getStringExtra("event") != null) {
-            epEventsTextView.setText(epEvents);
-        }
-        editPostButton = findViewById(R.id.editPostButton);
-        editPostButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editPost();
+            epEventsTextView = findViewById(R.id.epEventsTextView);
+            if (intent.getStringExtra("event") != null) {
+                epEventsTextView.setText(epEvents);
             }
-        });
-        editPostButton.setTextColor(Color.GRAY);
-        epImage = findViewById(R.id.epImage);
-        epShowPostLevelImageButton = findViewById(R.id.epShowPostLevelImageButton);
-        epEditText = findViewById(R.id.epEditText);
-        epEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() == 0 && epImage.getDrawable() == null) {
-                    editPostButton.setTextColor(Color.GRAY);
-                } else {
-                    editPostButton.setTextColor(Color.BLACK);
+            editPostButton = findViewById(R.id.editPostButton);
+            editPostButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    editPost();
                 }
-            }
-        });
-        epPhotoLL = findViewById(R.id.epPhotoLL);
-        epPhotoLLTextView = findViewById(R.id.epPhotoLLTextView);
-        epIncludeEventLL = findViewById(R.id.epIncludeEventLL);
-        epTagColleagueLL = findViewById(R.id.epTagColleagueLL);
-        epSpecifyDepartmentLL = findViewById(R.id.epSpecifyDepartmentLL);
+            });
+            editPostButton.setTextColor(Color.GRAY);
+            epImage = findViewById(R.id.epImage);
+            epShowPostLevelImageButton = findViewById(R.id.epShowPostLevelImageButton);
+            epEditText = findViewById(R.id.epEditText);
+            epEditText.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void afterTextChanged(Editable s) {
+                }
 
-        epPhotoLL.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                selectImage();
-            }
-        });
-        epIncludeEventLL.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                includeEvent();
-            }
-        });
-        epTagColleagueLL.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                tagColleague();
-            }
-        });
-        epSpecifyDepartmentLL.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                specifyDepartment();
-            }
-        });
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
 
-        initializeUI(intent.getIntExtra("position",-1));
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if (s.length() == 0 && epImage.getDrawable() == null) {
+                        editPostButton.setTextColor(Color.GRAY);
+                    } else {
+                        editPostButton.setTextColor(Color.BLACK);
+                    }
+                }
+            });
+            epPhotoLL = findViewById(R.id.epPhotoLL);
+            epPhotoLLTextView = findViewById(R.id.epPhotoLLTextView);
+            epIncludeEventLL = findViewById(R.id.epIncludeEventLL);
+            epTagColleagueLL = findViewById(R.id.epTagColleagueLL);
+            epSpecifyDepartmentLL = findViewById(R.id.epSpecifyDepartmentLL);
+
+            epPhotoLL.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    selectImage();
+                }
+            });
+            epIncludeEventLL.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    includeEvent();
+                }
+            });
+            epTagColleagueLL.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    tagColleague();
+                }
+            });
+            epSpecifyDepartmentLL.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    specifyDepartment();
+                }
+            });
+
+            initializeUI(intent.getIntExtra("position", -1));
+        }catch (Exception e){
+            Log.v("AppLogic","Something went wrong "
+                    +"the cause: " +e.getCause()
+                    + "the message: "+e.getMessage()
+            );
+        }
     }
 
     private void initializeUI(int position) {

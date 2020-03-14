@@ -1,6 +1,7 @@
 package com.example.isc.Core;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,43 +31,48 @@ public class IncludeEventActivity extends  Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view= inflater.inflate(R.layout.activity_include_event,container,false);
+        try {
 
+            eventsList = new ArrayList<String>() {{
+                add("INETech");
+                add("Welcome Day");
+                add("Innovation Day");
+                add("Indjaz");
+            }};
+            includedEvents = new ArrayList<>();
+            includeEventAdapter = new IncludeEventAdapter(Objects.requireNonNull(getActivity()).getApplicationContext(), R.layout.activity_include_event_list_adapter, eventsList);
+            eventsListView = view.findViewById(R.id.eventsListView);
+            eventsListView.setAdapter(includeEventAdapter);
 
-        eventsList = new ArrayList<String>(){{
-            add("INETech");
-            add("Welcome Day");
-            add("Innovation Day");
-            add("Indjaz");
-        }};
-        includedEvents = new ArrayList<>();
-        includeEventAdapter = new IncludeEventAdapter(Objects.requireNonNull(getActivity()).getApplicationContext(), R.layout.activity_include_event_list_adapter, eventsList);
-        eventsListView = view.findViewById(R.id.eventsListView);
-        eventsListView.setAdapter(includeEventAdapter);
-
-        includeEventButton = view.findViewById(R.id.includeEventButton);
-        includeEventButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                StringBuilder events = new StringBuilder();
-                for(int i=0; i<includedEvents.size(); i++){
-                    events.append("#");
-                    events.append(includedEvents.get(i));
-                    events.append(" ");
-                }
-                if(getActivity()!=null){
-                    if(getActivity() instanceof  CreatePostActivity){
-                        ((CreatePostActivity)getActivity()).events=events.toString();
-                        ((CreatePostActivity)getActivity()).returnViewToTheParentActivity();
+            includeEventButton = view.findViewById(R.id.includeEventButton);
+            includeEventButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    StringBuilder events = new StringBuilder();
+                    for (int i = 0; i < includedEvents.size(); i++) {
+                        events.append("#");
+                        events.append(includedEvents.get(i));
+                        events.append(" ");
                     }
-                    else if ( getActivity() instanceof  EditPostActivity){
-                        ((EditPostActivity)getActivity()).epEvents=events.toString();
-                        ((EditPostActivity)getActivity()).returnViewToTheParentActivity();
+                    if (getActivity() != null) {
+                        if (getActivity() instanceof CreatePostActivity) {
+                            ((CreatePostActivity) getActivity()).events = events.toString();
+                            ((CreatePostActivity) getActivity()).returnViewToTheParentActivity();
+                        } else if (getActivity() instanceof EditPostActivity) {
+                            ((EditPostActivity) getActivity()).epEvents = events.toString();
+                            ((EditPostActivity) getActivity()).returnViewToTheParentActivity();
+                        }
                     }
+
+
                 }
-
-
-            }
-        });
+            });
+        }catch (Exception e){
+            Log.v("AppLogic","Something went wrong "
+                    +"the cause: " +e.getCause()
+                    + "the message: "+e.getMessage()
+            );
+        }
         return view;
     }
 

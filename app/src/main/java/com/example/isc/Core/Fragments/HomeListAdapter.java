@@ -14,7 +14,9 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.example.isc.Common;
 import com.example.isc.Core.MyPost;
+import com.example.isc.Core.MyUser;
 import com.example.isc.Core.ShowUserProfileActivity;
 import com.example.isc.R;
 
@@ -157,9 +159,10 @@ public class HomeListAdapter extends ArrayAdapter<MyPost> {
         holder.posterProfileLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String[] s = {post.getMyUser().getFullName(), post.getMyUser().getPositionAsString(),};
+                MyUser aUser=post.getMyUser();
+                String[] s={aUser.getFullName(),aUser.getPositionAsString(), Common.convertBitmapToString(aUser.getProfileImageBitmap()),aUser.getEmail()};
                 Intent intent = new Intent(getContext(), ShowUserProfileActivity.class);
-                intent.putExtra("user", s);
+                intent.putExtra("user",s);
                 getContext().startActivity(intent);
             }
         });

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.isc.Common;
 import com.example.isc.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -21,14 +23,14 @@ import java.util.Objects;
 public class ShowUserProfileActivity extends AppCompatActivity {
 
     private TextView userName, userPosition, userStudentNumber, userEmail;
-    private  LinearLayout userPostsLayout;
-    private ImageView showProfilePostIV;
+    private LinearLayout userPostsLayout;
+    private ImageView showProfilePostIV, profileImageIV;
     private FloatingActionButton userPostsUpButton;
-    private  ScrollView scrollView;
+    private ScrollView scrollView;
 
-    private   NonScrollListView userPostsListView;
-    private   ShowUserProfilePostsListAdapter adapter;
-    private   ArrayList<MyPost> postArrayList=new ArrayList<>();
+    private NonScrollListView userPostsListView;
+    private ShowUserProfilePostsListAdapter adapter;
+    private ArrayList<MyPost> postArrayList = new ArrayList<>();
 
     Boolean userPostIsVisible = false;
 
@@ -37,25 +39,27 @@ public class ShowUserProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_user_profile);
+        try {
+            Intent intent = getIntent();
+            String[] user = intent.getStringArrayExtra("user");
 
-        Intent intent = getIntent();
-        String s[] = intent.getStringArrayExtra("user");
+            Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+            Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.img0_vector);
 
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        Objects.requireNonNull(getSupportActionBar()).setHomeAsUpIndicator(R.drawable.img0_vector);
-        assert s != null;
-        Objects.requireNonNull(getSupportActionBar()).setTitle(
-                Html.fromHtml("<font color=\"#1976D2\">"+ s[0] +"</font>")
-        );
-        userName = findViewById(R.id.userNameTextView);
-        userPosition = findViewById(R.id.userPositionTextView);
-        userName.setText(s[0]);
-        userPosition.setText(s[1]);
-        userStudentNumber = findViewById(R.id.userStudentNumberTextView);
-        userEmail = findViewById(R.id.userEmailTextView);
-        userPostsUpButton = findViewById(R.id.userProfileUpButton);
+            Objects.requireNonNull(getSupportActionBar()).setTitle(
+                    Html.fromHtml("<font color=\"#1976D2\">" + user[0] + "</font>")
+            );
+            userName = findViewById(R.id.userNameTextView);
+            userPosition = findViewById(R.id.userPositionTextView);
+            userName.setText(user[0]);
+            userPosition.setText(user[1]);
+            userStudentNumber = findViewById(R.id.userStudentNumberTextView);
+            userEmail = findViewById(R.id.userEmailTextView);
+            userEmail.setText(user[3]);
+            userPostsUpButton = findViewById(R.id.userProfileUpButton);
+            profileImageIV = findViewById(R.id.userProfileImage);
+            profileImageIV.setImageBitmap(Common.convertStringToBitmap(user[2]));
 
-        MyUser myUser0 = new MyUser("Garbage",null, "Bettouche", 1);
 /*
         final MyPost myPost0 = new MyPost(
                 myUser0,
@@ -92,39 +96,46 @@ public class ShowUserProfileActivity extends AppCompatActivity {
             add(myPost3);
         }};
 */
-        adapter = new ShowUserProfilePostsListAdapter(getApplicationContext(), R.layout.activity_home_list_adapter, postArrayList);
-        userPostsListView = findViewById(R.id.userPostsListView);
-        userPostsListView.setAdapter(adapter);
-        userPostsListView.setScrollContainer(false);
+            adapter = new ShowUserProfilePostsListAdapter(getApplicationContext(), R.layout.activity_home_list_adapter, postArrayList);
+            userPostsListView = findViewById(R.id.userPostsListView);
+            userPostsListView.setAdapter(adapter);
+            userPostsListView.setScrollContainer(false);
 
-        showProfilePostIV = findViewById(R.id.showUserProfilePostIV);
+            showProfilePostIV = findViewById(R.id.showUserProfilePostIV);
 
-        userPostsLayout = findViewById(R.id.userPostLayout);
-        userPostsLayout.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("RestrictedApi")
-            @Override
-            public void onClick(View v) {
-                if(!userPostIsVisible){
-                    userPostIsVisible = true;
-                    showProfilePostIV.setImageResource(R.drawable.ic_arrow_drop_up_24dp);
-                    userPostsListView.setVisibility(View.VISIBLE);
-                    userPostsUpButton.setVisibility(View.VISIBLE);
-                }else{
-                    userPostIsVisible = false;
-                    showProfilePostIV.setImageResource(R.drawable.ic_arrow_drop_down_24dp);
-                    userPostsListView.setVisibility(View.GONE);
-                    userPostsUpButton.setVisibility(View.GONE);
+            userPostsLayout = findViewById(R.id.userPostLayout);
+            userPostsLayout.setOnClickListener(new View.OnClickListener() {
+                @SuppressLint("RestrictedApi")
+                @Override
+                public void onClick(View v) {
+                    if (!userPostIsVisible) {
+                        userPostIsVisible = true;
+                        showProfilePostIV.setImageResource(R.drawable.ic_arrow_drop_up_24dp);
+                        userPostsListView.setVisibility(View.VISIBLE);
+                        userPostsUpButton.setVisibility(View.VISIBLE);
+                    } else {
+                        userPostIsVisible = false;
+                        showProfilePostIV.setImageResource(R.drawable.ic_arrow_drop_down_24dp);
+                        userPostsListView.setVisibility(View.GONE);
+                        userPostsUpButton.setVisibility(View.GONE);
+                    }
                 }
-            }
-        });
-        scrollView = findViewById(R.id.userScrollView);
-        userPostsUpButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                scrollView.fullScroll(ScrollView.FOCUS_UP);
-            }
-        });
+            });
+            scrollView = findViewById(R.id.userScrollView);
+            userPostsUpButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    scrollView.fullScroll(ScrollView.FOCUS_UP);
+                }
+            });
+        } catch (Exception e){
+            Log.v("AppLogic","Something went wrong "
+                    +"the cause: " +e.getCause()
+                    + "the message: "+e.getMessage()
+            );
+        }
     }
+
     @Override
     public void onBackPressed() {
         Intent intent = new Intent(getApplicationContext(), CoreActivity.class);
@@ -133,7 +144,7 @@ public class ShowUserProfileActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onSupportNavigateUp(){
+    public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
     }

@@ -252,7 +252,7 @@ public class ProfileFragment extends Fragment {
              if (task.isSuccessful()) {
 
                  //i will deal with the image later
-                 myUser0 = new MyUser(firebaseUser.getUid(),null, (String) Objects.requireNonNull(task.getResult()).get("name"), Objects.requireNonNull(task.getResult().getLong("position")).intValue());
+                 myUser0 = new MyUser(firebaseUser.getUid(),null, (String) Objects.requireNonNull(task.getResult()).get("name"), Objects.requireNonNull(task.getResult().getLong("position")).intValue(),task.getResult().getString("email"));
                  Log.v("ConnectivityFireBase", "Received profile successfully");
 
                  nameTextView.setText(myUser0.getFullName());

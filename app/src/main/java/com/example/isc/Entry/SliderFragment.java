@@ -2,6 +2,7 @@ package com.example.isc.Entry;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,57 +28,67 @@ public class SliderFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View fragmentView = inflater.inflate(R.layout.fragment_slider, container, false);
-        nextSignUpButton = fragmentView.findViewById(R.id.nextSignUpButton);
-        nextSignUpButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                nextLogin(v);
+        try {
+            nextSignUpButton = fragmentView.findViewById(R.id.nextSignUpButton);
+            nextSignUpButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    nextLogin(v);
+                }
+            });
+
+            viewPager = fragmentView.findViewById(R.id.viewPager);
+            imageAdapter = new SliderAdapter(getContext());
+            viewPager.setAdapter(imageAdapter);
+
+            sliderDotsPanel = fragmentView.findViewById(R.id.SliderDots);
+            dotsCount = imageAdapter.getCount();
+            dots = new ImageView[dotsCount];
+
+            for (int i = 0; i < dotsCount; i++) {
+                dots[i] = new ImageView(getContext());
+                dots[i].setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.nonactive_dot));
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
+                params.setMargins(8, 0, 8, 0);
+                sliderDotsPanel.addView(dots[i], params);
+
             }
-        });
+            dots[0].setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.active_dot));
 
-        viewPager = fragmentView.findViewById(R.id.viewPager);
-        imageAdapter = new SliderAdapter(getContext());
-        viewPager.setAdapter(imageAdapter);
+            viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageSelected(int position) {
+                    for (int i = 0; i < dotsCount; i++) {
+                        dots[i].setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.nonactive_dot));
+                    }
+                    dots[position].setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.active_dot));
+                }
 
-        sliderDotsPanel = fragmentView.findViewById(R.id.SliderDots);
-        dotsCount = imageAdapter.getCount();
-        dots = new ImageView[dotsCount];
+                @Override
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                    switch (viewPager.getCurrentItem()) {
+                        case 0:
+                            nextSignUpButton.setText(R.string.next);
+                            break;
+                        case 1:
+                            nextSignUpButton.setText(R.string.next);
+                            break;
+                        case 2:
+                            nextSignUpButton.setText(R.string.login);
+                    }
+                }
 
-        for(int i = 0; i < dotsCount; i++){
-            dots[i] = new ImageView(getContext());
-            dots[i].setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.nonactive_dot));
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT);
-            params.setMargins(8, 0, 8, 0);
-            sliderDotsPanel.addView(dots[i], params);
-
+                @Override
+                public void onPageScrollStateChanged(int state) {
+                }
+            });
+        }catch (Exception e){
+            Log.v("AppLogic","Something went wrong "
+                    +"the cause: " +e.getCause()
+                    + "the message: "+e.getMessage()
+            );
         }
-        dots[0].setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.active_dot));
-
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                for(int i = 0; i< dotsCount; i++){
-                    dots[i].setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.nonactive_dot));
-                }
-                dots[position].setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.active_dot));
-            }
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                switch(viewPager.getCurrentItem()){
-                    case 0:
-                        nextSignUpButton.setText(R.string.next);
-                        break;
-                    case 1:
-                        nextSignUpButton.setText(R.string.next);
-                        break;
-                    case 2:
-                        nextSignUpButton.setText(R.string.login);
-                }
-            }
-            @Override
-            public void onPageScrollStateChanged(int state) {}
-        });
         return fragmentView;
     }
     public void nextLogin(View view){

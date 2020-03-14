@@ -62,7 +62,7 @@ public class FinishSignUpActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_finish_sign_up);
-
+ try{
        signUpProfileImage = findViewById(R.id.signUpProfileImage);
        addSignUpProfileImageIV = findViewById(R.id.addSignUpProfileImageIV);
 
@@ -96,6 +96,12 @@ public class FinishSignUpActivity extends AppCompatActivity {
                 addSignUpProfileImageIV.setVisibility(View.GONE);
             }
         });
+ } catch (Exception e){
+     Log.v("AppLogic","Something went wrong "
+             +"the cause: " +e.getCause()
+             + "the message: "+e.getMessage()
+     );
+ }
     }
 
     public void signUpUser(View view){
@@ -129,7 +135,7 @@ public class FinishSignUpActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            addFullProfileToDataBase(name,positionSelected,department);
+                            addFullProfileToDataBase(name,positionSelected,department,firebaseUser.getEmail());
                         }
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -210,11 +216,12 @@ public class FinishSignUpActivity extends AppCompatActivity {
        startActivity(new Intent(getApplicationContext(),SignUpActivity.class));
        finish();
    }
-    private   void addFullProfileToDataBase(String name,int position,String department){
+    private   void addFullProfileToDataBase(String name,int position,String department,String email){
         firebaseFirestore=FirebaseFirestore.getInstance();
         final Map<String,Object> map =new HashMap<>();
         map.put("name",name);
         map.put("position",position);
+        map.put("email",email);
         map.put("department",department);
         map.put("profileImageReferenceInStorage","images/" + firebaseUser.getUid() + "/" + "ProfileImage" + ".JPEG");
         firebaseFirestore.collection("Profiles").document(firebaseUser.getUid()).set(map).addOnCompleteListener(new OnCompleteListener<Void>() {
