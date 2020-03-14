@@ -113,9 +113,9 @@ public class NotificationFragment extends Fragment {
       }
       if(!weAlreadyHaveThatProfile && !haveWeRequestedThatProfileYet){
 
-         ArrayList<Integer> notificationArrayListInitialize=new ArrayList<>();
-         notificationArrayListInitialize.add(theIndexOfNotificationThatRequestedThisProfile);
-        userProfileIDsWeAlreadyRequestedAndTheRequestingNotificationsIndexes.put(userID,notificationArrayListInitialize);
+         ArrayList<Integer> notificationIndexesArrayListInitialize=new ArrayList<>();
+         notificationIndexesArrayListInitialize.add(theIndexOfNotificationThatRequestedThisProfile);
+        userProfileIDsWeAlreadyRequestedAndTheRequestingNotificationsIndexes.put(userID,notificationIndexesArrayListInitialize);
         firebaseFirestore.collection("Profiles").document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -128,7 +128,7 @@ public class NotificationFragment extends Fragment {
                }
                getUserProfileImage(task.getResult().get("profileImageReferenceInStorage").toString()/*,userProfileIDsWeAlreadyRequestedAndTheRequestingNotificationsIndexes.get(userID).get(i)*/,allUsersProfiles.size()-1);
                dataUpdatedNotifyListView();
-
+               userProfileIDsWeAlreadyRequestedAndTheRequestingNotificationsIndexes.remove(userID);
             }
         }}).addOnFailureListener(new OnFailureListener() {
             @Override

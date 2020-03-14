@@ -340,42 +340,59 @@ public class EditPostActivity extends AppCompatActivity {
     }
 
     private void createNotificationDataOnServer(final String checkedDepartments, final String postID) {
-        firebaseFirestore.collection("AllPosts").document(/*aka users*/firebaseUser.getUid()).collection("userPosts").document(postID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        firebaseFirestore.collection("AllPosts").document(postID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                Map<String, Object> map = new HashMap<>();
-                map.put("userID", firebaseUser.getUid());
-                map.put("notificationText", "has edited his post in the department of " + checkedDepartments);
+                if(task.isSuccessful()){
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("userID", firebaseUser.getUid());
+                    String notificationText="has edited his post: "+task.getResult().getString("cpText").substring(0,8)+"...";
+                    if(checkedDepartments!=null){
+                        if(!checkedDepartments.equals("")){
+                           notificationText= notificationText.concat("in the department of " + checkedDepartments);
+                            map.put("notificationText", notificationText);
+                        }else{
+                            map.put("notificationText", notificationText);
+                        }
+                    }
 
+                    if (Objects.requireNonNull(task.getResult()).contains("date")) {
+                        map.put("notificationTime", Objects.requireNonNull(task.getResult().getTimestamp("date")).toDate().toString());
+                        map.put("notificationTimeInMillis",task.getResult().getLong("dateInMillis"));
 
-                if (Objects.requireNonNull(task.getResult()).contains("date")) {
-                    map.put("notificationTime", Objects.requireNonNull(task.getResult().getTimestamp("date")).toDate().toString());
-                    map.put("notificationTimeInMillis",task.getResult().getLong("dateInMillis"));
+                    } else {
+                        map.put("notificationTime", "");
+                        map.put("notificationTimeInMillis",0);
+                    }
 
-                } else {
-                    map.put("notificationTime", "");
-                    map.put("notificationTimeInMillis",0);
+                    firebaseFirestore.collection("Notifications").document(postID).set(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(getApplicationContext(), "Notification was sent to all users", Toast.LENGTH_LONG).show();
+                                goBackToCoreActivity();
+                            }
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            try {
+                                throw e;
+                            }
+                            catch(Exception ee){
+                                Log.v("ConnectivityFireBase", "Something went wrong we couldn't send notification" + e.getMessage());
+                            }
+                        }
+                    });
+                }else {
+                    try {
+                        throw task.getException();
+                    }
+                    catch(Exception ee){
+                        Log.v("ConnectivityFireBase", "Something went wrong we couldn't create notification" + ee.getMessage());
+                    }
                 }
 
-                firebaseFirestore.collection("Notifications").document(postID).set(map).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(getApplicationContext(), "Notification was sent to all users", Toast.LENGTH_LONG).show();
-                            goBackToCoreActivity();
-                        }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        try {
-                            throw e;
-                        }
-                        catch(Exception ee){
-                            Log.v("ConnectivityFireBase", "Something went wrong we couldn't send notification" + e.getMessage());
-                        }
-                    }
-                });
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override

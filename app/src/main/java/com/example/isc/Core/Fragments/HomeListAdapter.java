@@ -142,12 +142,22 @@ public class HomeListAdapter extends ArrayAdapter<MyPost> {
             if (postEvents != null) {
                 postEvents.setText(post.getMyPostEvents());
             }
-        }
+        } else {
+                if(postedImage!=null){
+                    if(post.hasImage()){
+                        holder.postedImage.setImageResource(R.drawable.post_image_placeholder);
+                        holder.postedImage.setVisibility(View.VISIBLE);
+                    }else{
+                        holder.postedImage.setImageBitmap(null);
+                        holder.postedImage.setVisibility(View.GONE);
+                    }
+                }
+            }
     }
         holder.posterProfileLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String[] s = {post.getMyUser().getFullName(), post.getMyUser().getPositionAsString()};
+                String[] s = {post.getMyUser().getFullName(), post.getMyUser().getPositionAsString(),};
                 Intent intent = new Intent(getContext(), ShowUserProfileActivity.class);
                 intent.putExtra("user", s);
                 getContext().startActivity(intent);

@@ -32,7 +32,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class HomeFragment extends Fragment {
@@ -43,6 +45,7 @@ public class HomeFragment extends Fragment {
     private FloatingActionButton createPostButton;
     private SwipeRefreshLayout pullToRefresh;
     private ArrayList<MyUser> allUsersProfiles = new ArrayList<>();
+    private Map<String,ArrayList<Integer>> userProfileIDsWeAlreadyRequestedAndTheRequestingPostsIndexes=new HashMap<>();
     private static int index = 0, top = 0;
     private  final String CHANNEL_ID="The ID IS String";//used by notification for android 8 and up
 
@@ -93,7 +96,7 @@ public class HomeFragment extends Fragment {
     }
 
 
-    private void getUserProfile(String userID, final int theIndexOfPostThatRequestedThisProfile) {
+    private void getUserProfile(final String userID, final int theIndexOfPostThatRequestedThisProfile) {
 
         boolean weAlreadyHaveThatProfile=false;
         for(int i=0;i<allUsersProfiles.size();i++){
@@ -103,14 +106,26 @@ public class HomeFragment extends Fragment {
                 break;
             }
         }
-        if(!weAlreadyHaveThatProfile){
+        boolean haveWeRequestedThatProfileYet=false;
+        if(userProfileIDsWeAlreadyRequestedAndTheRequestingPostsIndexes.containsKey(userID)){
+            haveWeRequestedThatProfileYet=true;
+            userProfileIDsWeAlreadyRequestedAndTheRequestingPostsIndexes.get(userID).add(theIndexOfPostThatRequestedThisProfile);
+        }
+        if(!weAlreadyHaveThatProfile && !haveWeRequestedThatProfileYet){
+           ArrayList<Integer> postArrayListIndexesInitializer=new ArrayList<>();
+           postArrayListIndexesInitializer.add(theIndexOfPostThatRequestedThisProfile);
+           userProfileIDsWeAlreadyRequestedAndTheRequestingPostsIndexes.put(userID,postArrayListIndexesInitializer);
+
             firebaseFirestore.collection("Profiles").document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                     MyUser user = new MyUser(task.getResult().getId(), null, Objects.requireNonNull(task.getResult().get("name")).toString(), Objects.requireNonNull(task.getResult().getLong("position")).intValue());
                     allUsersProfiles.add(user);
-                    postArrayList.get(theIndexOfPostThatRequestedThisProfile).setMyUser(user);
-                    getImageFromServer(Objects.requireNonNull(task.getResult().get("profileImageReferenceInStorage")).toString(), theIndexOfPostThatRequestedThisProfile, allUsersProfiles.size()-1, true);
+                    for(int i=0;i<userProfileIDsWeAlreadyRequestedAndTheRequestingPostsIndexes.get(userID).size();i++){
+                        postArrayList.get(userProfileIDsWeAlreadyRequestedAndTheRequestingPostsIndexes.get(userID).get(i)).setMyUser(allUsersProfiles.get(allUsersProfiles.size()-1));
+                    }
+                    getImageFromServer(Objects.requireNonNull(task.getResult().get("profileImageReferenceInStorage")).toString(),/*this one is useless here*/ theIndexOfPostThatRequestedThisProfile, allUsersProfiles.size()-1, true);
+                 userProfileIDsWeAlreadyRequestedAndTheRequestingPostsIndexes.remove(userID);
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -198,11 +213,8 @@ public class HomeFragment extends Fragment {
                                     dataUpdatedNotifyListView();
 
                             } else {
-
                                     allUsersProfiles.get(profileIndex).setProfileImageBitmap((BitmapFactory.decodeByteArray(Objects.requireNonNull(task.getResult()).clone(), 0, task.getResult().length)));
-                                    postArrayList.get(postArrayListIndex).setMyUser(allUsersProfiles.get(profileIndex));
                                     dataUpdatedNotifyListView();
-
                             }
 
                         } else {
@@ -217,6 +229,7 @@ public class HomeFragment extends Fragment {
                         }
                         catch (Exception ee){
                             Log.v("ConnectivityFireBase", "Something went wrong and we couldn't get images " + ee.getMessage());
+                           // removePostSomethingWentWrong(postArrayListIndex);
                         }
                     }
                 });
@@ -241,33 +254,5 @@ public class HomeFragment extends Fragment {
         Toast.makeText(getContext(), "Refreshed", Toast.LENGTH_SHORT).show();
     }
 
-
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    private String mParam1;
-    private String mParam2;
-
-    public HomeFragment() {
-
-    }
-
-    public static HomeFragment newInstance(String param1, String param2) {
-        HomeFragment fragment = new HomeFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
 
 }
