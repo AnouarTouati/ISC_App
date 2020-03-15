@@ -8,16 +8,17 @@ public class MyUser  {
     private Bitmap profileImageBitmap;
     private String fullName, email, password;
     private int position;
-    private long studentCardNumber;
+    private String studentRegistrationNumber;
     private final String userID;//final since id should not change
 
 
-    public MyUser(String userID,Bitmap profileImageBitmap, String fullName, int position,String email){
+    public MyUser(String userID,Bitmap profileImageBitmap, String fullName, int position,String email,String studentRegistrationNumber){
         this.userID=userID;
         this.profileImageBitmap =profileImageBitmap;
         this.fullName = fullName;
         this.position = position;
         this.email=email;
+        this.studentRegistrationNumber=studentRegistrationNumber;
     }
 
 
@@ -47,6 +48,7 @@ public class MyUser  {
 
     public String getUserID(){return userID;}
    public String getEmail(){return email;}
+   public String getStudentRegistrationNumber(){return studentRegistrationNumber;}
 
 
 }

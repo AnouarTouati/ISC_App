@@ -109,6 +109,14 @@
             android:inputType="textPersonName"
             android:layout_gravity="center"/>
 
+        <EditText
+            android:id="@+id/studentNumberFinishSignUp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Student Registration Number"
+            android:inputType="numberDecimal" />
+
         <LinearLayout
             android:paddingStart="10dp"
             android:paddingEnd="10dp"

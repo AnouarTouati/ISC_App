@@ -195,47 +195,7 @@
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
-                <LinearLayout
-                    android:id="@+id/userPostLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp">
-                    <ImageView
-                        android:layout_width="0dp"
-                        android:layout_weight="0.2"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center_vertical"
-                        android:src="@drawable/ic_history_24dp"/>
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_weight="0.8"
-                        android:layout_height="match_parent"
-                        android:text="@string/include_event"
-                        android:textColor="#000000"
-                        android:textSize="14sp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_weight="0.8"
-                            android:layout_height="match_parent">
-                            <TextView
-                                android:id="@+id/profilePostsTextView"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:text="My posts"
-                                android:textColor="#000000"
-                                android:textSize="16sp"
-                                android:gravity="center_vertical"/>
-                        </LinearLayout>
-                        <ImageView
-                            android:id="@+id/showUserProfilePostIV"
-                            android:layout_width="0dp"
-                            android:layout_weight="0.2"
-                            android:layout_height="30dp"
-                            android:layout_gravity="center_vertical"
-                            android:src="@drawable/ic_arrow_drop_down_24dp"/>
-                    </LinearLayout>
-                </LinearLayout>
+
                 <com.example.isc.Core.NonScrollListView
                     android:visibility="gone"
                     android:id="@+id/userPostsListView"

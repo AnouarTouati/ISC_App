@@ -188,7 +188,7 @@ public class ProfileFragment extends Fragment {
                     editPositionSpinner.setSelection(Common.convertPostionStringToInt(positionTextView.getText().toString()));
                 }else {
                    Toast.makeText(getContext(),"Something went wrong while displaying your postion in the club",Toast.LENGTH_LONG).show();
-                    Log.v("AppLogic","Something went wrong while getting index of club position");
+                    Log.v("AppLogic","Something went wrong while getting index of club position ProfileFragment");
                 }
                 editPositionIV.setImageResource(R.drawable.ic_add_gray_24dp);
                 p = true;
@@ -211,7 +211,7 @@ public class ProfileFragment extends Fragment {
                         editPositionSpinner.setSelection(Common.convertPostionStringToInt(positionTextView.getText().toString()));
                     }else {
                         Toast.makeText(getContext(),"Something went wrong while displaying your postion in the club",Toast.LENGTH_LONG).show();
-                        Log.v("AppLogic","Something went wrong while getting index of club position");
+                        Log.v("AppLogic","Something went wrong while getting index of club position ProfileFragment");
                     }
                     editPositionIV.setImageResource(R.drawable.ic_add_gray_24dp);
                     p = true;
@@ -238,7 +238,7 @@ public class ProfileFragment extends Fragment {
                     throw e;
                 }
                 catch (Exception ee){
-                    Log.v("ConnectivityFireBase", "Something went wrong and we couldn't Update position" + ee.getMessage());
+                    Log.v("ConnectivityFireBase", "Something went wrong and we couldn't Update position ProfileFragment" + ee.getMessage());
                 }
             }
         });
@@ -252,18 +252,19 @@ public class ProfileFragment extends Fragment {
              if (task.isSuccessful()) {
 
                  //i will deal with the image later
-                 myUser0 = new MyUser(firebaseUser.getUid(),null, (String) Objects.requireNonNull(task.getResult()).get("name"), Objects.requireNonNull(task.getResult().getLong("position")).intValue(),task.getResult().getString("email"));
+                 myUser0 = new MyUser(firebaseUser.getUid(),null, (String) Objects.requireNonNull(task.getResult()).get("name"), Objects.requireNonNull(task.getResult().getLong("position")).intValue(),task.getResult().getString("email")
+                 ,task.getResult().getString("studentRegistrationNumber"));
                  Log.v("ConnectivityFireBase", "Received profile successfully");
 
                  nameTextView.setText(myUser0.getFullName());
                  positionTextView.setText(myUser0.getPositionAsString());
-                 studentNumberTextView.setText("Not Implemented yet");
+                 studentNumberTextView.setText(myUser0.getStudentRegistrationNumber());
                  emailTextView.setText(firebaseUser.getEmail());
                  //we check for valid reference inside getImageFromServer method
                  getImageFromServer(task.getResult().get("profileImageReferenceInStorage").toString(),-1);//-1 indicates profile image
 
              } else {
-                 Log.v("ConnectivityFireBase", "Error receiving profile " + task.getException());
+                 Log.v("ConnectivityFireBase", "Error receiving profile ProfileFragment" + task.getException());
              }
          }
      }).addOnFailureListener(new OnFailureListener() {
@@ -273,7 +274,7 @@ public class ProfileFragment extends Fragment {
                  throw e;
              }
              catch (Exception ee){
-                 Log.v("ConnectivityFireBase", "Something went wrong and we couldn't get user profile" + ee.getMessage());
+                 Log.v("ConnectivityFireBase", "Something went wrong and we couldn't get user profile ProfileFragment" + ee.getMessage());
              }
          }
      });
@@ -306,7 +307,7 @@ public class ProfileFragment extends Fragment {
                     }
                     dataUpdatedNotifyListView();
                 } else {
-                    Log.v("ConnectivityFireBase", "Error receiving posts " + task.getException());
+                    Log.v("ConnectivityFireBase", "Error receiving posts ProfileFragment" + task.getException());
 
                 }
             }
@@ -317,7 +318,7 @@ public class ProfileFragment extends Fragment {
                     throw e;
                 }
                 catch (Exception ee){
-                    Log.v("ConnectivityFireBase", "Something went wrong and we couldn't get images" + ee.getMessage());
+                    Log.v("ConnectivityFireBase", "Something went wrong and we couldn't get images ProfileFragment" + ee.getMessage());
                 }
             }
         });
@@ -356,7 +357,7 @@ public class ProfileFragment extends Fragment {
                            }
 
                        } else {
-                           Log.d("ConnectivityFireBase", "Something went wrong and we couldn't get images " + Objects.requireNonNull(task.getException()).toString());
+                           Log.d("ConnectivityFireBase", "Something went wrong and we couldn't get images ProfileFragment" + Objects.requireNonNull(task.getException()).toString());
                        }
                    }
                }).addOnFailureListener(new OnFailureListener() {
@@ -366,12 +367,29 @@ public class ProfileFragment extends Fragment {
                            throw e;
                        }
                        catch (Exception ee){
-                           Log.v("ConnectivityFireBase", "Something went wrong and we couldn't get images" + ee.getMessage());
+                           Log.v("ConnectivityFireBase", "Something went wrong and we couldn't get images ProfileFragment" + ee.getMessage());
                        }
                    }
                });
-           } else{addPostToArrayListWithoutImage(postArrayListIndex);}
-       }else {addPostToArrayListWithoutImage(postArrayListIndex);}
+           } else{
+               if(postArrayListIndex!=-1){
+                   addPostToArrayListWithoutImage(postArrayListIndex);
+               }
+           else {
+                   //this can be problematic when loading images tp update and i cant be bothered to check
+               profileImage.setImageResource(R.drawable.ic_person_blue_24dp);
+               profileImageAsBitmap=null;
+                   getUserPosts();
+                  }
+           }
+       }else {
+           if(postArrayListIndex!=-1) {addPostToArrayListWithoutImage(postArrayListIndex);}
+           else {
+               profileImage.setImageResource(R.drawable.ic_person_blue_24dp);
+               profileImageAsBitmap=null;
+               getUserPosts();
+           }
+       }
    }
     private  void addPostToArrayListWithoutImage(int postArrayListIndex){
     MyPost aPost = postArrayList.get(postArrayListIndex);
@@ -434,39 +452,12 @@ public class ProfileFragment extends Fragment {
                     throw e;
                 }
                 catch (Exception ee){
-                    Log.v("ConnectivityFireBase", "Something went wrong we couldn't Delete the post" + ee.getMessage());
+                    Log.v("ConnectivityFireBase", "Something went wrong we couldn't Delete the post ProfileFragment" + ee.getMessage());
                 }
             }
         });
     }
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    private String mParam1;
-    private String mParam2;
-
-    public ProfileFragment() {
-
-    }
-
-    public static ProfileFragment newInstance(String param1, String param2) {
-        ProfileFragment fragment = new ProfileFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
 
     private void updateProfileName(String newName){
         firebaseFirestore.collection("Profiles").document(firebaseUser.getUid()).update("name",newName).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -481,7 +472,7 @@ public class ProfileFragment extends Fragment {
                     throw e;
                 }
                 catch (Exception ee){
-                    Log.v("ConnectivityFireBase", "Something went wrong we couldn't Update Profile name" + ee.getMessage());
+                    Log.v("ConnectivityFireBase", "Something went wrong we couldn't Update Profile name ProfileFragment" + ee.getMessage());
                 }
             }
         });
@@ -509,7 +500,7 @@ public class ProfileFragment extends Fragment {
 
                         progressDialog.dismiss();
                         Toast.makeText(getContext(), "Something went wrong we couldn't update your profile image", Toast.LENGTH_LONG).show();
-                        Log.v("ConnectivityFireBase", "Something went wrong we couldn't Update Profile image" + "onComplete callback Update Profile Image" + task.getException().getMessage());
+                        Log.v("ConnectivityFireBase", "Something went wrong we couldn't Update Profile image ProfileFragment"+ task.getException().getMessage());
                         somethingWentWrongPleaseTryAgainImageProblem(imageToPush);
 
                     }

@@ -25,15 +25,25 @@ public class Common {
 
    public static String convertBitmapToString(Bitmap image){
 
-        ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.WEBP,85,byteArrayOutputStream);
-        return Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+        if(image!=null){
+            ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
+            image.compress(Bitmap.CompressFormat.WEBP,85,byteArrayOutputStream);
+            return Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+        }
+        else{
+            return "";
+        }
+
     }
 
    public static Bitmap convertStringToBitmap(String image) {
-
-        byte[] bytes;
-        bytes = Base64.decode(image, Base64.DEFAULT);
-        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+       if(!image.equals("")){
+           byte[] bytes;
+           bytes = Base64.decode(image, Base64.DEFAULT);
+           return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+       }
+        else{
+            return null;
+       }
     }
 }

@@ -88,8 +88,14 @@ public class HomeListAdapter extends ArrayAdapter<MyPost> {
                 });
             }
             if (posterProfileImage != null) {
-                holder.posterProfileImage.setImageBitmap(post.getMyUser().getProfileImageBitmap());
-                holder.posterProfileImage.setDrawingCacheEnabled(true);
+                if(post.getMyUser().getProfileImageBitmap()!=null){
+                    holder.posterProfileImage.setImageBitmap(post.getMyUser().getProfileImageBitmap());
+                    holder.posterProfileImage.setDrawingCacheEnabled(true);
+                }
+                else{
+                    holder.posterProfileImage.setImageResource(R.drawable.ic_person_blue_24dp);
+                }
+
             }
             if (postedImage != null) {
                 if(post.hasImage()){
@@ -160,7 +166,7 @@ public class HomeListAdapter extends ArrayAdapter<MyPost> {
             @Override
             public void onClick(View v) {
                 MyUser aUser=post.getMyUser();
-                String[] s={aUser.getFullName(),aUser.getPositionAsString(), Common.convertBitmapToString(aUser.getProfileImageBitmap()),aUser.getEmail()};
+                String[] s={aUser.getFullName(),aUser.getPositionAsString(), Common.convertBitmapToString(aUser.getProfileImageBitmap()),aUser.getEmail(),aUser.getStudentRegistrationNumber()};
                 Intent intent = new Intent(getContext(), ShowUserProfileActivity.class);
                 intent.putExtra("user",s);
                 getContext().startActivity(intent);

@@ -45,7 +45,7 @@ public class FinishSignUpActivity extends AppCompatActivity {
 
       private  ImageView signUpProfileImage, addSignUpProfileImageIV;
       private  Bitmap signUpProfileImageBitmap=null;
-      private  EditText signUpFullName;
+      private  EditText signUpFullName,studentRegistrationNumberEV;
       private  Spinner departmentSpinner;
       private  RadioGroup positionRadio;
 
@@ -75,6 +75,7 @@ public class FinishSignUpActivity extends AppCompatActivity {
         firebaseFirestore=FirebaseFirestore.getInstance();
 
         signUpFullName = findViewById(R.id.signUpFullName);
+        studentRegistrationNumberEV=findViewById(R.id.studentNumberFinishSignUp);
         departmentSpinner = findViewById(R.id.departmentSpinner);
         positionRadio = findViewById(R.id.position);
 
@@ -108,7 +109,7 @@ public class FinishSignUpActivity extends AppCompatActivity {
         final String name = signUpFullName.getText().toString();
         final String department = departments.get(departmentSpinner.getSelectedItemPosition());
         final int positionSelected = (positionRadio.getCheckedRadioButtonId())-1;
-
+        final String studentRegistrationNumber=studentRegistrationNumberEV.getText().toString();
         if(!isValidName(name)){
             Toast.makeText(this,"Invalid Full Name",Toast.LENGTH_LONG).show();
             return;
@@ -135,7 +136,7 @@ public class FinishSignUpActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            addFullProfileToDataBase(name,positionSelected,department,firebaseUser.getEmail());
+                            addFullProfileToDataBase(name,positionSelected,department,firebaseUser.getEmail(),studentRegistrationNumber);
                         }
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -216,14 +217,20 @@ public class FinishSignUpActivity extends AppCompatActivity {
        startActivity(new Intent(getApplicationContext(),SignUpActivity.class));
        finish();
    }
-    private   void addFullProfileToDataBase(String name,int position,String department,String email){
+    private  void addFullProfileToDataBase(String name,int position,String department,String email,String studentRegistrationNumber){
         firebaseFirestore=FirebaseFirestore.getInstance();
         final Map<String,Object> map =new HashMap<>();
         map.put("name",name);
         map.put("position",position);
         map.put("email",email);
+        map.put("studentRegistrationNumber",studentRegistrationNumber);
         map.put("department",department);
-        map.put("profileImageReferenceInStorage","images/" + firebaseUser.getUid() + "/" + "ProfileImage" + ".JPEG");
+        if(signUpProfileImageBitmap==null){
+            map.put("profileImageReferenceInStorage","");
+        }else{
+            map.put("profileImageReferenceInStorage","images/" + firebaseUser.getUid() + "/" + "ProfileImage" + ".JPEG");
+        }
+
         firebaseFirestore.collection("Profiles").document(firebaseUser.getUid()).set(map).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
@@ -259,7 +266,7 @@ public class FinishSignUpActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+       deleteProfileAndGoBackToSignUpActivity();
     }
 
     public void toLogin(View view){

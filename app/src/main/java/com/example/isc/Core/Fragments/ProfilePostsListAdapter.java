@@ -90,7 +90,13 @@ public class ProfilePostsListAdapter extends ArrayAdapter<MyPost> {
                 });
             }
             if (posterProfileImage != null) {
-                holder.posterProfileImage.setImageBitmap(post.getMyUser().getProfileImageBitmap());
+                if(post.getMyUser().getProfileImageBitmap()!=null){
+                    holder.posterProfileImage.setImageBitmap(post.getMyUser().getProfileImageBitmap());
+                    holder.posterProfileImage.setDrawingCacheEnabled(true);
+                }
+                else{
+                    holder.posterProfileImage.setImageResource(R.drawable.ic_person_blue_24dp);
+                }
             }
             if (postedImage != null) {
 

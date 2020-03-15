@@ -7,7 +7,6 @@ import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -23,8 +22,8 @@ import java.util.Objects;
 public class ShowUserProfileActivity extends AppCompatActivity {
 
     private TextView userName, userPosition, userStudentNumber, userEmail;
-    private LinearLayout userPostsLayout;
-    private ImageView showProfilePostIV, profileImageIV;
+
+    private ImageView profileImageIV;
     private FloatingActionButton userPostsUpButton;
     private ScrollView scrollView;
 
@@ -54,11 +53,17 @@ public class ShowUserProfileActivity extends AppCompatActivity {
             userName.setText(user[0]);
             userPosition.setText(user[1]);
             userStudentNumber = findViewById(R.id.userStudentNumberTextView);
+            userStudentNumber.setText(user[4]);
             userEmail = findViewById(R.id.userEmailTextView);
             userEmail.setText(user[3]);
             userPostsUpButton = findViewById(R.id.userProfileUpButton);
             profileImageIV = findViewById(R.id.userProfileImage);
-            profileImageIV.setImageBitmap(Common.convertStringToBitmap(user[2]));
+            if(Common.convertStringToBitmap(user[2])!=null){
+                profileImageIV.setImageBitmap(Common.convertStringToBitmap(user[2]));
+            }else{
+                profileImageIV.setImageResource(R.drawable.ic_person_blue_24dp);
+            }
+
 
 /*
         final MyPost myPost0 = new MyPost(
@@ -101,26 +106,7 @@ public class ShowUserProfileActivity extends AppCompatActivity {
             userPostsListView.setAdapter(adapter);
             userPostsListView.setScrollContainer(false);
 
-            showProfilePostIV = findViewById(R.id.showUserProfilePostIV);
 
-            userPostsLayout = findViewById(R.id.userPostLayout);
-            userPostsLayout.setOnClickListener(new View.OnClickListener() {
-                @SuppressLint("RestrictedApi")
-                @Override
-                public void onClick(View v) {
-                    if (!userPostIsVisible) {
-                        userPostIsVisible = true;
-                        showProfilePostIV.setImageResource(R.drawable.ic_arrow_drop_up_24dp);
-                        userPostsListView.setVisibility(View.VISIBLE);
-                        userPostsUpButton.setVisibility(View.VISIBLE);
-                    } else {
-                        userPostIsVisible = false;
-                        showProfilePostIV.setImageResource(R.drawable.ic_arrow_drop_down_24dp);
-                        userPostsListView.setVisibility(View.GONE);
-                        userPostsUpButton.setVisibility(View.GONE);
-                    }
-                }
-            });
             scrollView = findViewById(R.id.userScrollView);
             userPostsUpButton.setOnClickListener(new View.OnClickListener() {
                 @Override

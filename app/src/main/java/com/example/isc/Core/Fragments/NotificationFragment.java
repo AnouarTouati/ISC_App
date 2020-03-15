@@ -121,7 +121,8 @@ public class NotificationFragment extends Fragment {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
            if (task.isSuccessful()){
 
-               MyUser user= new MyUser(userID,null, (String) task.getResult().get("name"), task.getResult().getLong("position").intValue(),task.getResult().getString("email"));
+               MyUser user= new MyUser(userID,null, (String) task.getResult().get("name"), task.getResult().getLong("position").intValue(),task.getResult().getString("email")
+               ,task.getResult().getString("studentRegistrationNumber"));
                allUsersProfiles.add(user);//whenever we need to assign a user we must use this array to keep the refrence so that when we update the image it changes all over the place
                for(int i=0;i<userProfileIDsWeAlreadyRequestedAndTheRequestingNotificationsIndexes.get(userID).size();i++){
                    notificationArrayList.get(userProfileIDsWeAlreadyRequestedAndTheRequestingNotificationsIndexes.get(userID).get(i)).setMyUser(allUsersProfiles.get(allUsersProfiles.size()-1));
@@ -137,7 +138,7 @@ public class NotificationFragment extends Fragment {
                     throw e;
                 }
                 catch (Exception ee){
-                    Log.v("ConnectivityFireBase", "Something went wrong getting profile " + ee.getMessage());
+                    Log.v("ConnectivityFireBase", "Something went wrong getting profile NotificationFragment" + ee.getMessage());
                 }
             }
         });
@@ -161,7 +162,7 @@ public class NotificationFragment extends Fragment {
                             }
 
                         else{
-                            Log.d("ConnectivityFireBase", "Something went wrong and we couldn't get images "+task.getException().toString());
+                            Log.d("ConnectivityFireBase", "Something went wrong and we couldn't get images NotificationFragment"+task.getException().toString());
                         }
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -171,7 +172,7 @@ public class NotificationFragment extends Fragment {
                             throw e;
                         }
                         catch (Exception ee){
-                            Log.v("ConnectivityFireBase", "Something went wrong and we couldn't get images " + ee.getMessage());
+                            Log.v("ConnectivityFireBase", "Something went wrong and we couldn't get images NotificationFragment" + ee.getMessage());
                         }
                     }
                 });
@@ -184,28 +185,4 @@ public class NotificationFragment extends Fragment {
        notificationListView.setAdapter(notificationListAdapter);
    }
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    private String mParam1;
-    private String mParam2;
-    public NotificationFragment() {
-
-    }
-    public static NotificationFragment newInstance(String param1, String param2) {
-        NotificationFragment fragment = new NotificationFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
 }

@@ -119,7 +119,8 @@ public class HomeFragment extends Fragment {
             firebaseFirestore.collection("Profiles").document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    MyUser user = new MyUser(task.getResult().getId(), null, Objects.requireNonNull(task.getResult().get("name")).toString(), Objects.requireNonNull(task.getResult().getLong("position")).intValue(),task.getResult().getString("email"));
+                    MyUser user = new MyUser(task.getResult().getId(), null, Objects.requireNonNull(task.getResult().get("name")).toString(), Objects.requireNonNull(task.getResult().getLong("position")).intValue(),task.getResult().getString("email")
+                    ,task.getResult().getString("studentRegistrationNumber"));
                     allUsersProfiles.add(user);
                     for(int i=0;i<userProfileIDsWeAlreadyRequestedAndTheRequestingPostsIndexes.get(userID).size();i++){
                         postArrayList.get(userProfileIDsWeAlreadyRequestedAndTheRequestingPostsIndexes.get(userID).get(i)).setMyUser(allUsersProfiles.get(allUsersProfiles.size()-1));
@@ -134,7 +135,7 @@ public class HomeFragment extends Fragment {
                         throw e;
                     }
                     catch (Exception ee){
-                        Log.v("ConnectivityFireBase", "Error getting profile " + ee.getMessage());
+                        Log.v("ConnectivityFireBase", "Error getting profile  HomeFragment" + ee.getMessage());
                     }
                 }
             });
@@ -175,7 +176,7 @@ public class HomeFragment extends Fragment {
                         }
 
                     } else {
-                        Log.v("ConnectivityFireBase", "Error receiving posts " + task.getException());
+                        Log.v("ConnectivityFireBase", "Error receiving posts  HomeFragment" + task.getException());
 
                     }
                 }
@@ -186,14 +187,14 @@ public class HomeFragment extends Fragment {
                         throw  e;
                     }
                     catch (Exception ee){
-                        Log.v("ConnectivityFireBase", "Error receiving posts " + ee.getMessage());
+                        Log.v("ConnectivityFireBase", "Error receiving posts HomeFragment " + ee.getMessage());
                     }
                 }
             });
 
     }
 
-    private void getImageFromServer(String storageReferencePath, final int postArrayListIndex, final int profileIndex, final boolean aProfileImage) {
+    private void getImageFromServer(final String storageReferencePath, final int postArrayListIndex, final int profileIndex, final boolean aProfileImage) {
         if (storageReferencePath != null) {
             if (!storageReferencePath.equals("")) {
 
@@ -218,7 +219,8 @@ public class HomeFragment extends Fragment {
                             }
 
                         } else {
-                            Log.d("ConnectivityFireBase", "Something went wrong and we couldn't get images " + Objects.requireNonNull(task.getException()).toString());
+                            Log.v("ConnectivityFireBase", "Something went wrong and we couldn't get images  HomeFragment" + Objects.requireNonNull(task.getException()).toString());
+                            Log.v("ConnectivityFireBase","Path cuasing the error is "+storageReferencePath);
                         }
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -228,14 +230,20 @@ public class HomeFragment extends Fragment {
                             throw e;
                         }
                         catch (Exception ee){
-                            Log.v("ConnectivityFireBase", "Something went wrong and we couldn't get images " + ee.getMessage());
+                            Log.v("ConnectivityFireBase", "Something went wrong and we couldn't get images  HomeFragment" + ee.getMessage());
+                            Log.v("ConnectivityFireBase","Path cuasing the error is "+storageReferencePath);
                            // removePostSomethingWentWrong(postArrayListIndex);
                         }
                     }
                 });
+            } else if(aProfileImage) {
+                allUsersProfiles.get(profileIndex).setProfileImageBitmap(null);
+                dataUpdatedNotifyListView();
             }
-
-    }
+    }else if(aProfileImage) {
+            allUsersProfiles.get(profileIndex).setProfileImageBitmap(null);
+            dataUpdatedNotifyListView();
+        }
     }
 
 

@@ -48,10 +48,13 @@ public class NotificationListAdapter extends ArrayAdapter<MyNotification> {
         if (myNotification != null) {
             if(myNotification.getMyUser()!=null){
             if (notificationProfileImage != null) {
-
+                if(myNotification.getMyUser().getProfileImageBitmap()!=null){
                     holder.notificationProfileImage.setImageBitmap(myNotification.getMyUser().getProfileImageBitmap());
                     holder.notificationProfileImage.setDrawingCacheEnabled(true);
-
+                }
+                else{
+                    holder.notificationProfileImage.setImageResource(R.drawable.ic_person_blue_24dp);
+                }
             }
             if (notificationTextView != null) {
                 holder.notificationTextView.setText(
