@@ -485,13 +485,14 @@ public class ProfileFragment extends Fragment {
             StorageReference imageReference = firebaseStorage.getReference();
             imageReference = imageReference.child("images/"+firebaseUser.getUid()+"/"+"ProfileImage"+".JPEG");
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            imageToPush.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+            imageToPush.compress(Bitmap.CompressFormat.JPEG, Common.IMAGE_QUALITY, byteArrayOutputStream);
             byte[] imageInBytes = byteArrayOutputStream.toByteArray();
             UploadTask uploadImageTask = imageReference.putBytes(imageInBytes);
             uploadImageTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                     if (task.isSuccessful()) {
+                        firebaseFirestore.collection("Profiles").document(firebaseUser.getUid()).update("profileImageReferenceInStorage","images/"+firebaseUser.getUid()+"/"+"ProfileImage"+".JPEG");
                         progressDialog.dismiss();
                         Toast.makeText(getContext(), "Done", Toast.LENGTH_LONG).show();
                         Log.v("ConnectivityFireBase", "Done Updating Profile image");
