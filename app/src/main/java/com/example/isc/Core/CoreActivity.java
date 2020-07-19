@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
@@ -12,8 +14,13 @@ import com.example.isc.Core.Fragments.HomeFragment;
 import com.example.isc.Core.Fragments.NotificationFragment;
 import com.example.isc.Core.Fragments.ProfileFragment;
 import com.example.isc.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.Objects;
 
@@ -27,6 +34,9 @@ public class CoreActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_core);
+
+        FirebaseMessaging.getInstance().subscribeToTopic("Main");
+
         try {
             homeTabItem = findViewById(R.id.homeTabItem);
             notificationTabItem = findViewById(R.id.notificationTabItem);
@@ -127,6 +137,27 @@ public class CoreActivity extends AppCompatActivity {
     private void setProfile() {
         viewPager.setCurrentItem(2);
 
+    }
+    //used for test purposes only
+    private void getFCMToken(){
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.v("FCMToken", "getInstanceId failed", task.getException());
+                            return;
+                        }
+
+                        // Get new Instance ID token
+                        String token = task.getResult().getToken();
+
+                        // Log and toast
+
+                        Log.v("FCMToken", token);
+                        Toast.makeText(CoreActivity.this, token, Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 }
 
