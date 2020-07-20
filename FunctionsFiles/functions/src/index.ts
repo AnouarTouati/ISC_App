@@ -8,19 +8,20 @@ admin.initializeApp()
 export const HelloWorld = functions.https.onRequest((request,response)=>{
   response.send("Hello World")
 })*/
-
+/*
 export const bosttonWeatherUpdate = functions.firestore.document ("cities-weather/boston-ma-us")
   .onUpdate(change=> {
-   const datemodified=change.after.updateTime;
+   const dataAfter=change.after.get("temp")
+   const dataBefore=change.before.get("temp")
                     const topic = 'Main'
                     const payload2 = { 
                                          notification: {
-                                            title: 'Anouar has posted in Media '+datemodified?.toDate.toString(),
-                                            body: 'Event X postponed'
+                                            title: dataAfter,
+                                            body: dataAfter
                                                        },
                                         topic : topic
                                      };
-                    console.log("My FCM Successfull "+datemodified?.toDate.toString())
+                    console.log("My FCM Successfull before:"+dataBefore+"  after:"+dataAfter)
                     
                     return admin.messaging().send(payload2)
                       .catch(error =>{
@@ -28,33 +29,42 @@ export const bosttonWeatherUpdate = functions.firestore.document ("cities-weathe
                                       }
                             )
                   }
-         )
-         /*
+         )*/
+         
 export const NewPostCreateNotificationAndSendIt=functions.firestore.document('/AllPosts/{PostID}')
 .onCreate(async (snapshot,context)=>{
-  try{
-    const postData=snapshot.data()
 
     const dataNotification={
-      userID : postData.userID,
-      notificationText : `${postData.} has posted in the department of ${postData.checkedDepartments}`,
-      notificationTime : postData.notificationTime,
-      notificationTimeInMillis :postData.notificationTimeInMillis
+      name :"null",
+      userID : snapshot.get("userID"),
+      postID : snapshot.get("postID"),
+      notificationText : snapshot.get("cpText"),
+      notificationTime : snapshot.get("date"),
+      notificationTimeInMillis :snapshot.get("dateInMillis")
     }
-  await admin.firestore().collection("Notifications").doc(postData.postID).set(dataNotification)
+    const promise=admin.firestore().collection("Profiles").doc(dataNotification.userID).get()
 
-  const topic="Main"
-  const payload={
-    notification : {
-        title : `SomeOne Has Posted In ${notificationData.checkedDepartments}`,
-        body : "Event X postponed"
-
-    },
-    topic : topic
-  }
-  return admin.messaging().send(payload)
-  }catch(err){
-console.log("Error Creating Notification")
-  }
-    
-})*/
+ const promise2 = promise.then(profileSnapshot=>{
+   const name=profileSnapshot.get("name")
+  dataNotification.name=name
+  return admin.firestore().collection("Notifications").doc(snapshot.get("postID")).set(dataNotification)
+ })
+       
+  const promise3 = promise2.then(writeresult=>{
+    const topic="Main"
+    const payload={
+      notification : {
+          title : `${dataNotification.name} Has Posted In ${snapshot.get("checkedDepartments")}`,
+          body : dataNotification.notificationText
+  
+      },
+      topic : topic
+    }
+     return admin.messaging().send(payload)
+  })
+ 
+ promise3.catch(error=>{
+    console.log("Error Creating Notification")
+  })
+      
+})

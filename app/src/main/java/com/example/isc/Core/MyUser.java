@@ -1,10 +1,12 @@
 package com.example.isc.Core;
 
 import android.graphics.Bitmap;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.example.isc.Common;
 
-public class MyUser  {
+public class MyUser implements Parcelable {
     private Bitmap profileImageBitmap;
     private String fullName, email, password;
     private int position;
@@ -21,6 +23,28 @@ public class MyUser  {
         this.studentRegistrationNumber=studentRegistrationNumber;
     }
 
+
+    protected MyUser(Parcel in) {
+        profileImageBitmap = in.readParcelable(Bitmap.class.getClassLoader());
+        fullName = in.readString();
+        email = in.readString();
+        password = in.readString();
+        position = in.readInt();
+        studentRegistrationNumber = in.readString();
+        userID = in.readString();
+    }
+
+    public static final Creator<MyUser> CREATOR = new Creator<MyUser>() {
+        @Override
+        public MyUser createFromParcel(Parcel in) {
+            return new MyUser(in);
+        }
+
+        @Override
+        public MyUser[] newArray(int size) {
+            return new MyUser[size];
+        }
+    };
 
     public Bitmap getProfileImageBitmap() {
         return profileImageBitmap;
@@ -51,4 +75,19 @@ public class MyUser  {
    public String getStudentRegistrationNumber(){return studentRegistrationNumber;}
 
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(profileImageBitmap, flags);
+        dest.writeString(fullName);
+        dest.writeString(email);
+        dest.writeString(password);
+        dest.writeInt(position);
+        dest.writeString(studentRegistrationNumber);
+        dest.writeString(userID);
+    }
 }

@@ -66,7 +66,6 @@ public class CreatePostActivity extends AppCompatActivity {
     public String checkedDepartments = "", events = "", colleagues = "",textToPost="";
     private ProgressDialog progressDialog;
 
-
     private  FirebaseFirestore firebaseFirestore;
     private FirebaseUser firebaseUser;
 
@@ -78,6 +77,8 @@ public class CreatePostActivity extends AppCompatActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_post);
+
+
 try {
     scrollView = findViewById(R.id.createPostScrollView);
     viewPagerAdapter = new CreatePostViewPagerAdapter(getSupportFragmentManager());
@@ -182,6 +183,7 @@ try {
 
 
             final Map<String, Object> map = new HashMap<>();
+         
             map.put("userID",firebaseUser.getUid());
             map.put("checkedDepartments", checkedDepartments);
             map.put("events", events);
@@ -210,7 +212,7 @@ try {
                                 } else {
                                     PushPostImageToServer(Objects.requireNonNull(map.get("imageReferenceInStorage")).toString(), cpImageAsBitmap, Objects.requireNonNull(map.get("postID")).toString());
                                 }
-                                createNotificationDataOnServer(checkedDepartments, Objects.requireNonNull(map.get("postID")).toString());
+                            //    createNotificationDataOnServer(checkedDepartments, Objects.requireNonNull(map.get("postID")).toString());
                             } else {
                                 progressDialog.dismiss();
                                 Toast.makeText(getApplicationContext(), "Something went wrong we couldn't post", Toast.LENGTH_LONG).show();

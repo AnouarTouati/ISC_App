@@ -60,7 +60,7 @@ public class ProfileFragment extends Fragment {
     private EditText nameEditText;
     private ImageView editNameIV, editPositionIV, showProfilePostIV;
     private static final int PICK_IMAGE = 1;
-    private MyUser myUser0;
+
 
     private Boolean n = false, p = false, s = false, e = false, postIsVisible = false;
 
@@ -70,7 +70,7 @@ public class ProfileFragment extends Fragment {
     private  NonScrollListView profilePostsListView;
     private  ProfilePostsListAdapter adapter;
     public static ArrayList<MyPost> postArrayList = new ArrayList<>();
-
+    private MyUser myUser0;
     private  FirebaseUser firebaseUser;
     private  FirebaseFirestore firebaseFirestore;
     private  FirebaseStorage firebaseStorage;
@@ -228,7 +228,7 @@ public class ProfileFragment extends Fragment {
             public void onComplete(@NonNull Task<Void> task) {
                if(task.isSuccessful()){
                    positionTextView.setText(Common.position[newClubPosition]);
-                   myUser0.setPosition(newClubPosition);
+                    myUser0.setPosition(newClubPosition);
                }
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -530,4 +530,5 @@ public class ProfileFragment extends Fragment {
                 }).setNegativeButton("Cancel", null);
         alertDialogBuilder.create().show();
     }
+
 }

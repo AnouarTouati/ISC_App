@@ -255,7 +255,8 @@ public class HomeFragment extends Fragment {
 
 
     private void createPost() {
-        startActivity(new Intent(getContext(), CreatePostActivity.class));
+        Intent intent=new Intent(getContext(), CreatePostActivity.class);
+        startActivity(intent);
     }
 
     private void refreshData() {

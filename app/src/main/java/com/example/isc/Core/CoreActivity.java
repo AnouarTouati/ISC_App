@@ -29,6 +29,7 @@ public class CoreActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private TabItem homeTabItem, notificationTabItem, profileTabItem;
     private ViewPager viewPager;
+    private CreatePostViewPagerAdapter pagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +46,7 @@ public class CoreActivity extends AppCompatActivity {
             tabLayout = findViewById(R.id.coreActivityTabLayout);
             viewPager = findViewById(R.id.coreActivityViewPager);
 
-            CreatePostViewPagerAdapter pagerAdapter = new CreatePostViewPagerAdapter(getSupportFragmentManager());
+            pagerAdapter = new CreatePostViewPagerAdapter(getSupportFragmentManager());
             pagerAdapter.addFragment(new HomeFragment());
             pagerAdapter.addFragment(new NotificationFragment());
             pagerAdapter.addFragment(new ProfileFragment());
@@ -159,6 +160,7 @@ public class CoreActivity extends AppCompatActivity {
                     }
                 });
     }
+
 }
 
 
