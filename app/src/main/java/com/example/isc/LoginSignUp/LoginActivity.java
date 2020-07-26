@@ -111,32 +111,7 @@ public class LoginActivity extends AppCompatActivity {
                    startActivity(new Intent(getApplicationContext(),CoreActivity.class));
                    Log.v("ConnectivityFireBase","Successfully logged in");
                }
-               else {
-                   try{
-                       throw Objects.requireNonNull(task.getException());
 
-                   }
-
-                   catch (FirebaseAuthException e){
-
-                       switch (e.getErrorCode()){
-
-                           case  "ERROR_USER_DISABLED"  : Toast.makeText(getApplicationContext(),"Your account has been disabled",Toast.LENGTH_LONG).show(); break;
-                           case  "ERROR_USER_NOT_FOUND" : Toast.makeText(getApplicationContext(),"This account doesn't exist",Toast.LENGTH_LONG).show();break;
-                           case  "ERROR_WRONG_PASSWORD" : Toast.makeText(getApplicationContext(),"Invalid Password",Toast.LENGTH_LONG).show();break;
-                           default: Toast.makeText(getApplicationContext(),"Something went wrong and we couldn't sign you in",Toast.LENGTH_LONG).show();
-                               Log.v("ConnectivityFireBase",e.getMessage() +" the  cause is "+e.getCause() );break;
-
-                       }
-                   }
-                   catch (Exception e) {
-
-                       Log.v("ConnectivityFireBase",e.getMessage() +" the  cause is "+e.getCause() );
-                       Toast.makeText(getApplicationContext(),"Something went wrong and we couldn't sign you in",Toast.LENGTH_LONG).show();
-                   }
-
-                   progressDialog.dismiss();
-               }
            }
        }).addOnFailureListener(new OnFailureListener() {
            @Override

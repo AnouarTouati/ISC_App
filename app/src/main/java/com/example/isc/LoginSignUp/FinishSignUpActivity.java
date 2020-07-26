@@ -242,11 +242,6 @@ public class FinishSignUpActivity extends AppCompatActivity {
                     }else{
                         pushPostImageToServer(map.get("profileImageReferenceInStorage").toString(),signUpProfileImageBitmap);
                     }
-
-
-                }else{
-                    Toast.makeText(getApplicationContext(), "Something went wrong we couldn't Finish SignUp", Toast.LENGTH_LONG).show();
-                    Log.v("ConnectivityFireBase", "Something went wrong we couldn't Finish SignUp" + "onComplete callback addFullProfileToDataBase" + task.getException().getMessage());
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
