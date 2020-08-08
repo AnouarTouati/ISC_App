@@ -1,13 +1,7 @@
 import * as functions from 'firebase-functions';
-import * as admin from 'firebase-admin'
-//import { Change } from 'firebase-functions';
-//import { Message } from 'firebase-functions/lib/providers/pubsub';
+import * as admin from 'firebase-admin';
 
-admin.initializeApp()
-/*
-export const HelloWorld = functions.https.onRequest((request,response)=>{
-  response.send("Hello World")
-})*/
+admin.initializeApp();
 /*
 export const bosttonWeatherUpdate = functions.firestore.document ("cities-weather/boston-ma-us")
   .onUpdate(change=> {
@@ -42,7 +36,7 @@ export const NewPostCreateNotificationAndSendIt=functions.firestore.document('/A
       notificationTime : snapshot.get("date"),
       notificationTimeInMillis :snapshot.get("dateInMillis")
     }
-    const promise=admin.firestore().collection("Profiles").doc(dataNotification.userID).get()
+   return const promise=admin.firestore().collection("Profiles").doc(dataNotification.userID).get()
 
  const promise2 = promise.then(profileSnapshot=>{
    const name=profileSnapshot.get("name")
