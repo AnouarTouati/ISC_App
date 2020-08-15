@@ -29,7 +29,9 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,11 +82,13 @@ public class NotificationFragment extends Fragment {
                  for(int i=0;i<notificationSnaps.size();i++){
                      String userID=notificationSnaps.get(i).get("userID").toString();
                      String notificationText=notificationSnaps.get(i).get("notificationText").toString();
-                     String notificationTime=notificationSnaps.get(i).get("notificationTime").toString();
+                     Long notificationTime=(Long)notificationSnaps.get(i).get("notificationTimeInMillis");
+                     SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy.MM.dd 'at' HH:mm:ss");
+                     Date date = new Date(notificationTime);
                      //we must add it first so we dont loose track of where this notification is//if we dont it will get messy trust me
-                     MyNotification aNotification=new MyNotification(null,notificationText,notificationTime);
+                     MyNotification aNotification=new MyNotification(null,notificationText,simpleDateFormat.format(date));
                      notificationArrayList.add(aNotification);
-                     getUserProfileAndAddNotification(userID,notificationText,notificationTime,i);
+                     getUserProfileAndAddNotification(userID,notificationText,simpleDateFormat.format(date),i);
                  }
          }
      });
